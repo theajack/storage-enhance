@@ -1,0 +1,26 @@
+{
+    "name": "storage-enhance",
+    "version": "0.0.1",
+    "description": "Powerful, easy-to-use event mechanism",
+    "main": "storage-enhance.min.js",
+    "scripts": {},
+    "unpkg": "storage-enhance.min.js",
+    "jsdelivr": "storage-enhance.min.js",
+    "typings": "storage-enhance.min.d.ts",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/theajack/storage-enhance.git"
+    },
+    "keywords": [
+        "事件机制",
+        "事件总线",
+        "event mechanism"
+    ],
+    "author": "theajack",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/theajack/storage-enhance/issues"
+    },
+    "homepage": "https://theajack.gitee.io/storage-enhance/",
+    "dependencies": {}
+}
