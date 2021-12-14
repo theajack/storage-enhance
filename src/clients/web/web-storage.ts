@@ -2,28 +2,22 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:47:42
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-13 08:10:08
- * @FilePath: /storage-enhance/src/web/web-storage.ts
+ * @LastEditTime: 2021-12-14 08:56:25
+ * @FilePath: /storage-enhance/src/clients/web/web-storage.ts
  * @Description: Coding something
  */
 
 import {TempStorege} from 'src/temp/temp-storage';
 import {TStorageType} from 'src/type/constant';
-import {IStorage, IStorageTypeArg} from '../type/storage';
+import {IStorage, IStorageTypeArg} from '../../type/storage';
 
 
 export const WebStorege: IStorage = {
     type: 'local',
     length ({type} = {}) {
-        if (type === 'temp') {
-            return TempStorege.length();
-        }
         return getStorageType(type).length;
     },
     get ({key, type}) {
-        if (type === 'temp') {
-            return TempStorege.get({key});
-        }
         return getStorageType(type).getItem(key);
     },
 

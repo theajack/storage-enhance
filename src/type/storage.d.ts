@@ -5,11 +5,11 @@ import {IJson} from './util';
  * @Author: tackchen
  * @Date: 2021-12-12 14:30:47
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-13 08:58:46
+ * @LastEditTime: 2021-12-14 08:57:15
  * @FilePath: /storage-enhance/src/type/storage.d.ts
  * @Description: Coding something
  */
-export type TStorageKey = string | number;
+export type TStorageKey = string;
 
 export interface IStorageTypeArg {
     type?: TStorageType;
@@ -35,7 +35,8 @@ export interface IStorage {
 }
 
 export type TStorageDataType = 'string' | 'bigint' | 'number' | 'boolean' | 'symbol' |
-    'undefined' | 'object' | 'function' | 'html' | 'date';
+    'undefined' | 'object' | 'function' |
+    'html' | 'date' | 'null' | 'reg';
 
 
 export interface IStorageBaseOption {
@@ -44,6 +45,7 @@ export interface IStorageBaseOption {
     once?: boolean; // 是否是一次性的
     compress?: boolean; // 是否压缩存储
     encrypt?: boolean; // 是否为加密存储
+    path?: string;
 }
 
 export interface IStorageData extends IStorageBaseOption {
@@ -52,7 +54,14 @@ export interface IStorageData extends IStorageBaseOption {
 
 export interface IStorageCommonSetOption extends IStorageBaseOption {
     key: TStorageKey;
-    onSet: ()=>void;
-    onGet: ()=>void;
-    onRemove: ()=>void;
+    onSet?(): void;
+    onGet?(): void;
+    onRemove?(): void;
 }
+
+export interface IValueConverter {
+    get(v: any): any;
+    set(v: any): any;
+}
+
+export type TOprate = 'get' | 'set';
