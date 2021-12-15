@@ -4,3 +4,4 @@
 /cdn
 /dist
 **/*.html
+**/*.min.js

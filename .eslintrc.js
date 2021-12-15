@@ -8,6 +8,7 @@ module.exports = {
     "require": true,
     "Promise": true,
     "wx": true,
+    "Symbol": true,
   },
   env: {
     "browser": true,

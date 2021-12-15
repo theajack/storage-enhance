@@ -2,13 +2,14 @@
  * @Author: tackchen
  * @Date: 2021-12-14 08:34:06
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-15 14:29:13
+ * @LastEditTime: 2021-12-16 01:30:17
  * @FilePath: /storage-enhance/src/convert/storage-type.ts
  * @Description: Coding something
  */
 import {TStorageType} from 'src/type/constant';
 import {TStorageDataType} from '../type/storage';
 import {isUndf} from '../utils/util';
+import {StorageEnv} from './storage-env';
 
 let GlobalType: TStorageType = 'local';
 
@@ -23,10 +24,13 @@ export function globalType () {
 const StorageTypeMap:{
     [prop in TStorageDataType]?: any
 } = {
-    html: HTMLElement,
     date: Date,
     reg: RegExp,
 };
+
+if (StorageEnv === 'web') {
+    StorageTypeMap.html = HTMLElement;
+}
 
 function storageTypeOfObject (value: object): TStorageDataType | '' {
     if (!value) {

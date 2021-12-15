@@ -1,12 +1,12 @@
-const event = require('../npm/tc-event.min');
 const {startTest} = require('easy-test-lib');
 const fs = require('fs');
 const path = require('path');
 const getAllCases = require('./get-cases');
 const lib = require('./lib');
+const storage = require('../npm/storage-enhance.min');
 
 startTest({
-    args: {event, lib},
+    args: {storage, lib},
     cases: getAllCases(),
     onTestComplete (result) { // 测试全部完成回调 可选
         let txtContent = '';

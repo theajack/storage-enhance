@@ -5,16 +5,21 @@
  * @FilePath: /storage-enhance/src/clients/node/node-storage.ts
  * @Description: Coding something
  */
-import fs from 'fs';
-import path from 'path';
-import {
-    IBaseStorage, IStorageKeyArg,
-} from '../../type/storage';
 import {StorageEnv} from '../../convert/storage-env';
+import {IBaseStorage, IStorageKeyArg} from '../../type/storage';
+import {IFS, IPath} from '../../type/node';
 import {EMPTY} from '../../utils/constant';
+
+let fs: IFS = {} as IFS;
+let path: IPath = {} as IPath;
+if (StorageEnv === 'node') {
+    fs = require('fs');
+    path = require('path');
+}
 
 const StoreDir = '/storage-enhance-node';
 const HomePath = StorageEnv === 'node' ? (process.env.HOME || process.env.USERPROFILE || '') : '';
+
 const storeDirPath = StorageEnv === 'node' ? path.resolve(HomePath, `.${StoreDir}`) : '';
 
 if (StorageEnv === 'node') {
@@ -103,7 +108,7 @@ function findKeysBase (base: string, filePath: string, keys: string[]) {
     return keys;
 }
 
-function buildFilePath ({key, path: filePath = ''}: IStorageKeyArg) {
+function buildFilePath ({key, path: filePath = ''}: IStorageKeyArg): string {
     key = encodeURIComponent(key);
     if (filePath) {
         const pathArr = filePath.split('/');

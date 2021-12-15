@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-14 08:34:32
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-15 17:27:10
+ * @LastEditTime: 2021-12-16 01:48:59
  * @FilePath: /storage-enhance/src/convert/storage-env.ts
  * @Description: Coding something
  */
@@ -14,3 +14,9 @@ export const StorageEnv: TStorageEnv = (() => {
     if (isMiniApp) return 'miniapp';
     return 'node';
 })();
+
+if (StorageEnv === 'web') {
+    if (typeof require !== 'function') {
+        window.require = (() => {})as any;
+    }
+}

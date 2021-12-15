@@ -13,8 +13,8 @@ module.exports = () => {
         entry: path.resolve('./', 'src/index.ts'),
         output: {
             path: path.resolve('./', 'npm'),
-            filename: 'tc-event.min.js',
-            library: 'TEvent',
+            filename: 'storage-enhance.min.js',
+            library: 'StorageEnhance',
             libraryTarget: 'umd',
             libraryExport: 'default',
             globalObject: 'this',
@@ -22,7 +22,10 @@ module.exports = () => {
         resolve: {
             extensions: [ '.tsx', '.ts', '.js' ]
         },
-        externals: {},
+        externals: {
+            'fs': 'commonjs fs',
+            'path': 'commonjs path'
+        },
         module: {
             rules: [{
                 test: /(.ts)$/,
@@ -47,8 +50,7 @@ module.exports = () => {
         plugins: [
             new CopyWebpackPlugin({
                 patterns: [
-                    {from: 'src/index.d.ts', to: 'tc-event.min.d.ts'},
-                    {from: 'src/type.d.ts'},
+                    {from: 'src/type', to: 'type'},
                     {from: 'README.cn.md'},
                     {from: 'README.md'},
                     {from: 'LICENSE'}
