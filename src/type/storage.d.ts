@@ -5,7 +5,7 @@ import {IJson} from './util';
  * @Author: tackchen
  * @Date: 2021-12-12 14:30:47
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-14 08:57:15
+ * @LastEditTime: 2021-12-15 08:54:43
  * @FilePath: /storage-enhance/src/type/storage.d.ts
  * @Description: Coding something
  */
@@ -23,7 +23,7 @@ export interface IStorageValueArg extends IStorageKeyArg {
     value: any;
 }
 
-export interface IStorage {
+export interface IBaseStorage {
     type: TStorageType;
     length(arg?: IStorageTypeArg): number;
     all(arg?: IStorageTypeArg): IJson;
@@ -65,3 +65,7 @@ export interface IValueConverter {
 }
 
 export type TOprate = 'get' | 'set';
+
+export interface IStorage extends IBaseStorage {
+    set(arg: IStorageCommonSetOption): boolean;
+}

@@ -2,11 +2,13 @@
  * @Author: tackchen
  * @Date: 2021-12-12 15:56:05
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-12 16:03:41
+ * @LastEditTime: 2021-12-15 08:04:37
  * @FilePath: /storage-enhance/src/constant.ts
  * @Description: Coding something
  */
 import {TStorageEnv, TStorageType} from './type/constant';
+
+export const EMPTY = window.Symbol('storage-empty');
 
 export const STORAGE_TYPE: {
     [prop: string]: TStorageType
@@ -22,5 +24,4 @@ export const STORAGE_ENV: {
     WEB: 'web',
     NODE: 'node',
     MINIAPP: 'miniapp',
-    TEMP: 'temp',
 };

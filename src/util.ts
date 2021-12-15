@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:04:32
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-14 08:31:27
+ * @LastEditTime: 2021-12-15 08:01:21
  * @FilePath: /storage-enhance/src/util.ts
  * @Description: Coding something
  */
@@ -30,4 +30,12 @@ export function deepClone (value: any) {
         }
     }
     return objClone;
+}
+
+export function paserJSON (value: string) : object | null {
+    try {
+        return JSON.parse(value);
+    } catch (e) {
+        return null;
+    }
 }

@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-13 08:24:30
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-14 08:54:59
+ * @LastEditTime: 2021-12-15 09:01:56
  * @FilePath: /storage-enhance/src/convert/converter.ts
  * @Description: Coding something
  */
@@ -13,30 +13,30 @@ import {storageTypeOf} from './storage-type';
 import {convertValue} from './value-convert';
 
 export function setDataConvert ({
-    value, type
+    value, storageType = 'local'
 }: {
     value: any,
-    type: TStorageType,
+    storageType?: TStorageType,
 }): IStorageData {
-    const dataType = storageTypeOf(value);
+    const type = storageTypeOf(value);
     return {
-        type: dataType,
-        value: type === 'temp' ?
+        type,
+        value: storageType === 'temp' ?
             value :
-            convertValue({dataType, value, oprate: 'set'})
+            convertValue({type, value, oprate: 'set'})
     };
 }
 
 export function getDataConvert ({
-    value, type
+    value, storageType = 'local'
 }: {
     value: IStorageData,
-    type: TStorageType,
+    storageType?: TStorageType,
 }): any {
-    return type === 'temp' ?
+    return storageType === 'temp' ?
         value.value :
         convertValue({
-            dataType: value.type,
+            type: value.type,
             value: value.value,
             oprate: 'get'
         });

@@ -2,17 +2,17 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:47:42
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-14 08:56:25
+ * @LastEditTime: 2021-12-15 08:52:09
  * @FilePath: /storage-enhance/src/clients/web/web-storage.ts
  * @Description: Coding something
  */
 
-import {TempStorege} from 'src/temp/temp-storage';
 import {TStorageType} from 'src/type/constant';
-import {IStorage, IStorageTypeArg} from '../../type/storage';
+import {IJson} from 'src/type/util';
+import {IBaseStorage} from '../../type/storage';
 
 
-export const WebStorege: IStorage = {
+export const WebStorage: IBaseStorage = {
     type: 'local',
     length ({type} = {}) {
         return getStorageType(type).length;
@@ -20,14 +20,44 @@ export const WebStorege: IStorage = {
     get ({key, type}) {
         return getStorageType(type).getItem(key);
     },
-
-    // get(arg?: IStorageKeyArg): any;
-    // set(arg?: IStorageValueArg): boolean;
-    // remove(arg?: IStorageKeyArg): boolean;
-    // all(arg?: IStorageTypeArg): IJson;
-    // clear(arg?: IStorageTypeArg): boolean;
+    set ({key, value, type}) {
+        try {
+            getStorageType(type).setItem(key, value);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    },
+    remove ({key, type}) {
+        try {
+            getStorageType(type).removeItem(key);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    },
+    clear ({type} = {}) {
+        try {
+            getStorageType(type).clear();
+            return true;
+        } catch (e) {
+            return false;
+        }
+    },
+    all ({type} = {}) {
+        const data: IJson<string | null> = {};
+        const storage = getStorageType(type);
+        for (let i = 0, length = this.length({type}); i < length; i++) {
+            const key = storage.key(i) || '';
+            data[key] = storage.getItem(key);
+        }
+        return data;
+    },
+    exist ({key, type}) {
+        return getStorageType(type).hasOwnProperty(key);
+    }
 };
 
-function getStorageType (type: TStorageType = WebStorege.type): Storage {
+function getStorageType (type: TStorageType = WebStorage.type): Storage {
     return type === 'local' ? window.localStorage : window.sessionStorage;
 }
