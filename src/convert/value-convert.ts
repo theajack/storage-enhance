@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-14 08:36:01
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-15 08:32:57
+ * @LastEditTime: 2021-12-15 12:46:49
  * @FilePath: /storage-enhance/src/convert/value-convert.ts
  * @Description: Coding something
  */
@@ -35,13 +35,13 @@ const ValueConvertMap: {
 };
 
 export function convertValue ({
-    type, value, oprate
+    type, data, oprate
 }:{
     type: TStorageDataType;
-    value: any
+    data: any
     oprate: TOprate
 }) {
     const converter = ValueConvertMap[type];
-    if (!converter) return value;
-    return converter[oprate](value);
+    if (!converter) return data;
+    return converter[oprate](data);
 }

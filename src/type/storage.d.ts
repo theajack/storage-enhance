@@ -1,11 +1,11 @@
-import {TStorageType} from './constant';
+import {TStorageEnv, TStorageType} from './constant';
 import {IJson} from './util';
 
 /*
  * @Author: tackchen
  * @Date: 2021-12-12 14:30:47
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-15 08:54:43
+ * @LastEditTime: 2021-12-15 17:30:17
  * @FilePath: /storage-enhance/src/type/storage.d.ts
  * @Description: Coding something
  */
@@ -13,6 +13,7 @@ export type TStorageKey = string;
 
 export interface IStorageTypeArg {
     type?: TStorageType;
+    path?: string;
 }
 
 export interface IStorageKeyArg extends IStorageTypeArg {
@@ -24,8 +25,8 @@ export interface IStorageValueArg extends IStorageKeyArg {
 }
 
 export interface IBaseStorage {
-    type: TStorageType;
     length(arg?: IStorageTypeArg): number;
+    keys(arg?: IStorageTypeArg): string[];
     all(arg?: IStorageTypeArg): IJson;
     clear(arg?: IStorageTypeArg): boolean;
     get(arg: IStorageKeyArg): any;
@@ -52,8 +53,7 @@ export interface IStorageData extends IStorageBaseOption {
     type: TStorageDataType;
 }
 
-export interface IStorageCommonSetOption extends IStorageBaseOption {
-    key: TStorageKey;
+export interface IStorageCommonSetOption extends IStorageBaseOption, IStorageKeyArg {
     onSet?(): void;
     onGet?(): void;
     onRemove?(): void;
@@ -67,5 +67,7 @@ export interface IValueConverter {
 export type TOprate = 'get' | 'set';
 
 export interface IStorage extends IBaseStorage {
+    env: TStorageEnv;
+    type(type?: TStorageType): TStorageType | void;
     set(arg: IStorageCommonSetOption): boolean;
 }

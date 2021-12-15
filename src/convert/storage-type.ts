@@ -2,12 +2,23 @@
  * @Author: tackchen
  * @Date: 2021-12-14 08:34:06
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-14 08:37:06
+ * @LastEditTime: 2021-12-15 14:29:13
  * @FilePath: /storage-enhance/src/convert/storage-type.ts
  * @Description: Coding something
  */
+import {TStorageType} from 'src/type/constant';
 import {TStorageDataType} from '../type/storage';
-import {isUndf} from '../util';
+import {isUndf} from '../utils/util';
+
+let GlobalType: TStorageType = 'local';
+
+export function setGlobalType (type: TStorageType) {
+    GlobalType = type;
+}
+
+export function globalType () {
+    return GlobalType;
+}
 
 const StorageTypeMap:{
     [prop in TStorageDataType]?: any

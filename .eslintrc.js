@@ -7,7 +7,7 @@ module.exports = {
     "module": true,
     "require": true,
     "Promise": true,
-    "wx": true
+    "wx": true,
   },
   env: {
     "browser": true,

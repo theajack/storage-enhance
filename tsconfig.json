@@ -18,16 +18,22 @@
         "removeComments": false,
         "jsx": "preserve",
         "lib": ["esnext", "dom"],
-        // "types": ["jest", "puppeteer", "node"],
+        "typeRoots": [
+            "node_modules/@types",
+            "./src/type"
+        ],
+        "types": ["node"],
         "rootDir": ".",
         // "paths": {
         //   "@vue/*": ["packages/*/src"]
         // }
     },
     "include": [
-        "./src/**/*"
+        "./src/**/*",
+        "./public/**/*"
     ],
     "exclude": [
-        "./node_modules"
+        "./node_modules",
+        "./src/**/*.d.ts"
     ]
 }

@@ -2,23 +2,25 @@
  * @Author: tackchen
  * @Date: 2021-12-12 16:25:06
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-12 17:05:02
+ * @LastEditTime: 2021-12-15 13:15:55
  * @FilePath: /storage-enhance/src/temp/temp-storage.ts
  * @Description: Coding something
  */
 
-import {deepClone} from 'src/util';
+import {deepClone} from '../utils/util';
 import {
-    IStorage,
+    IBaseStorage,
 } from '../type/storage';
 import {IJson} from '../type/util';
 
 let storageMap: IJson = {};
 
-export const TempStorege: IStorage = {
-    type: 'temp',
+export const TempStorege: IBaseStorage = {
     length () {
-        return Object.keys(storageMap).length;
+        return this.keys().length;
+    },
+    keys () {
+        return Object.keys(storageMap);
     },
     exist ({key}) {
         return storageMap.hasOwnProperty(key);

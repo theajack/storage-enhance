@@ -2,16 +2,13 @@
  * @Author: tackchen
  * @Date: 2021-12-12 13:58:00
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-12 16:53:12
+ * @LastEditTime: 2021-12-15 15:25:34
  * @FilePath: /storage-enhance/src/index.ts
  * @Description: Coding something
  */
-import {deepClone} from './util';
 
-declare global {
-    interface Window{
-        [prop: string]: any;
-    }
-}
+// eslint-disable-next-line spaced-comment
+/// <reference path="./type/wx.d.ts" />
+import {Storage} from './adapter';
 
-window.deepClone = deepClone;
+export default Storage;

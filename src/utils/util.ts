@@ -2,12 +2,12 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:04:32
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-15 08:01:21
- * @FilePath: /storage-enhance/src/util.ts
+ * @LastEditTime: 2021-12-15 15:21:25
+ * @FilePath: /storage-enhance/src/utils/util.ts
  * @Description: Coding something
  */
-import './type/wx.d';
-import {IJson} from './type/util';
+
+import {IJson} from '../type/util';
 
 export const isWeb = (() => {
     return typeof window === 'object' && !!window && !isUndf(window.localStorage);

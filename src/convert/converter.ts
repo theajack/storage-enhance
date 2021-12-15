@@ -13,31 +13,31 @@ import {storageTypeOf} from './storage-type';
 import {convertValue} from './value-convert';
 
 export function setDataConvert ({
-    value, storageType = 'local'
+    data, storageType = 'local'
 }: {
-    value: any,
+    data: any,
     storageType?: TStorageType,
 }): IStorageData {
-    const type = storageTypeOf(value);
+    const type = storageTypeOf(data);
     return {
         type,
         value: storageType === 'temp' ?
-            value :
-            convertValue({type, value, oprate: 'set'})
+            data :
+            convertValue({type, data, oprate: 'set'})
     };
 }
 
 export function getDataConvert ({
-    value, storageType = 'local'
+    data, storageType = 'local'
 }: {
-    value: IStorageData,
+    data: IStorageData,
     storageType?: TStorageType,
 }): any {
     return storageType === 'temp' ?
-        value.value :
+        data.value :
         convertValue({
-            type: value.type,
-            value: value.value,
+            type: data.type,
+            data: data.value,
             oprate: 'get'
         });
 }

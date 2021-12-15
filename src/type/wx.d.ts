@@ -1,16 +1,18 @@
 
-declare namespace wx {
-    function getStorageInfoSync(): {
+declare interface WX {
+    getStorageInfoSync(): {
         keys: Array<string>;
         currentSize: number;
         limitSize: number;
     };
 
-    function clearStorageSync(): void;
+    clearStorageSync(): void;
 
-    function removeStorageSync(key: string): void;
+    removeStorageSync(key: string): void;
 
-    function setStorageSync(key: string, data: any): void;
+    setStorageSync(key: string, data: any): void;
 
-    function getStorageSync(key: string): any;
+    getStorageSync(key: string): any;
 }
+
+declare const wx: WX;
