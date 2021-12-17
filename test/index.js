@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const getAllCases = require('./get-cases');
 const lib = require('./lib');
-const storage = require('../npm/storage-enhance.min');
+const storage = require('../public/node-dev.min');
 
 startTest({
     args: {storage, lib},
@@ -31,12 +31,10 @@ startTest({
             log();
         });
 
-        
         console.log(`测试结果: ${result.passed ? '' : '不'}通过`);
         console.log(`测试用例数: ${result.results.length}`);
         console.log(`总耗时: ${result.time}ms`);
         log();
-        
         
         fs.writeFileSync(path.resolve('./', 'test/test-report.json'), JSON.stringify(result, null, 4), 'utf8');
         fs.writeFileSync(path.resolve('./', 'test/test-report.txt'), txtContent, 'utf8');

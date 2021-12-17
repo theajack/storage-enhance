@@ -5,7 +5,7 @@ import {IJson} from './util';
  * @Author: tackchen
  * @Date: 2021-12-12 14:30:47
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-15 17:30:17
+ * @LastEditTime: 2021-12-17 18:04:38
  * @FilePath: /storage-enhance/src/type/storage.d.ts
  * @Description: Coding something
  */
@@ -71,3 +71,5 @@ export interface IStorage extends IBaseStorage {
     type(type?: TStorageType): TStorageType | void;
     set(arg: IStorageCommonSetOption): boolean;
 }
+
+export type TTempMapOprateType = 'get' | 'set' | 'clear';

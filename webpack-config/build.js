@@ -1,6 +1,7 @@
 const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const RunNodeWebpackPlugin = require('run-node-webpack-plugin');
+const webpack = require('webpack');
 
 const fs = require('fs');
 const version = require('../package.json').version;
@@ -56,7 +57,10 @@ module.exports = () => {
                     {from: 'LICENSE'}
                 ]
             }),
-            new RunNodeWebpackPlugin({scriptToRun: './helper/sync-npm-version.js'})
+            new RunNodeWebpackPlugin({scriptToRun: './helper/sync-npm-version.js'}),
+            new webpack.DefinePlugin({
+                // 'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+            }),
         ]
     };
 };

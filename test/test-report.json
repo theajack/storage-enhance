@@ -1,19 +1,17 @@
 {
     "passed": true,
-    "time": 5,
+    "time": 1,
     "results": [
         {
-            "result": [
-                1,
-                2
-            ],
-            "expect": [
-                1,
-                2
-            ],
+            "result": {
+                "a": 1
+            },
+            "expect": {
+                "a": 1
+            },
             "passed": true,
             "index": 0,
-            "time": 5,
+            "time": 1,
             "name": "测试times参数"
         }
     ]

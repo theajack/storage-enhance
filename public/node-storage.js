@@ -116,8 +116,8 @@ function exist ({key, path}) {
 
 
 const key = (findKeys({path: '/aa/bb'}))[0];
-console.log(resolvePath(key, '/aa/bb'));
-console.log(fs.readFileSync(resolvePath(key, '/aa/bb'), 'utf-8'));
+// console.log(resolvePath(key, '/aa/bb'));
+// console.log(fs.readFileSync(resolvePath(key, '/aa/bb'), 'utf-8'));
 
 // console.log(removeData({key: 'aaaa', path: '/aa/bb', value: {a: 2}}));
 // console.log(removePath({path: '/aa/bb'}));

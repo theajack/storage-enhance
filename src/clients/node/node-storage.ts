@@ -18,11 +18,10 @@ if (StorageEnv === 'node') {
 }
 
 const StoreDir = '/storage-enhance-node';
-const HomePath = StorageEnv === 'node' ? (process.env.HOME || process.env.USERPROFILE || '') : '';
-
-const storeDirPath = StorageEnv === 'node' ? path.resolve(HomePath, `.${StoreDir}`) : '';
+const HomePath = process.env.HOME || process.env.USERPROFILE || '/';
 
 if (StorageEnv === 'node') {
+    const storeDirPath = path.resolve(HomePath, `.${StoreDir}`);
     if (!fs.existsSync(storeDirPath)) {
         fs.mkdirSync(storeDirPath);
     }
@@ -45,14 +44,15 @@ export const NodeStorege: IBaseStorage = {
     },
     set ({key, value, path}) {
         const filePath = buildFilePath({key, path});
-        fs.writeFileSync(filePath, JSON.stringify(value));
+        console.log(filePath);
+        fs.writeFileSync(filePath, value);
         return true;
     },
     remove ({key, path}) {
         const filePath = buildFilePath({key, path});
         if (fs.existsSync(filePath)) {
             try {
-                fs.rmSync(filePath);
+                fs.rmSync(checkRemoveFilePath(filePath));
                 return true;
             } catch (e) {
                 return false;
@@ -70,12 +70,15 @@ export const NodeStorege: IBaseStorage = {
         const filePath = buildFilePath({key: '', path});
         if (fs.existsSync(filePath)) {
             try {
-                fs.rmdirSync(filePath);
+                console.log(filePath);
+                removeDir(filePath);
                 return true;
             } catch (e) {
+                console.log(e);
                 return false;
             }
         }
+        console.log(filePath);
         return false;
     }
 };
@@ -109,7 +112,6 @@ function findKeysBase (base: string, filePath: string, keys: string[]) {
 }
 
 function buildFilePath ({key, path: filePath = ''}: IStorageKeyArg): string {
-    key = encodeURIComponent(key);
     if (filePath) {
         const pathArr = filePath.split('/');
         let mkdir = '';
@@ -122,5 +124,28 @@ function buildFilePath ({key, path: filePath = ''}: IStorageKeyArg): string {
             }
         }
     }
-    return path.resolve(HomePath, `.${StoreDir}${filePath}/${key}.json`);
+    if (key) {key = `/${key}.json`;}
+    return path.resolve(HomePath, `.${StoreDir}${filePath}${key}`);
+}
+
+function removeDir (dirPath: string) {
+    const fileList = fs.readdirSync(dirPath);
+    for (let i = 0, length = fileList.length; i < length; i++) {
+        const fileName = fileList[i];
+        const index = fileName.lastIndexOf('.json');
+        const filePath = `${dirPath}/${fileName}`;
+        if (index !== -1) { // 可以用.json 来判断是否是文件 是因为path中的点都没替换成空了
+            fs.rmSync(checkRemoveFilePath(filePath));
+        } else {
+            removeDir(filePath);
+            fs.rmdirSync(checkRemoveFilePath(filePath));
+        }
+    }
+}
+
+function checkRemoveFilePath (filePath: string) {
+    if (filePath.indexOf(StoreDir) === -1) {
+        throw new Error(`Invaild Removed FilePath:${filePath}`);
+    }
+    return filePath;
 }

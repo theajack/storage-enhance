@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:04:14
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-15 15:01:49
+ * @LastEditTime: 2021-12-17 17:29:32
  * @FilePath: /storage-enhance/src/adapter.ts
  * @Description: Coding something
  */
@@ -18,6 +18,7 @@ import {TStorageEnv, TStorageType} from './type/constant';
 import {IBaseStorage, IStorage, IStorageData} from './type/storage';
 import {IJson} from './type/util';
 import {paserJSON} from './utils/util';
+import {EMPTY} from './utils/constant';
 
 const StorageMap: {
     [prod in TStorageEnv]: IBaseStorage
@@ -42,15 +43,22 @@ export const Storage: IStorage = {
             return globalType();
         }
     },
-    length: ({type} = {}) => getFinalBaseStorage(type).length({type}),
-    clear: ({type} = {}) => getFinalBaseStorage(type).clear({type}),
-    keys: ({type} = {}) => getFinalBaseStorage(type).keys({type}),
-    remove: ({key, type}) => getFinalBaseStorage(type).remove({key, type}),
-    exist: ({key, type}) => getFinalBaseStorage(type).exist({key, type}),
+    length: ({type, path} = {}) => getFinalBaseStorage(type).length({type, path}),
+    clear: ({type, path} = {}) => getFinalBaseStorage(type).clear({type, path}),
+    keys: ({type, path} = {}) => getFinalBaseStorage(type).keys({type, path}),
+    remove: ({key, type, path}) => {
+        if (key === '') {return true;}
+        return getFinalBaseStorage(type).remove({key, type, path});
+    },
+    exist: ({key, type, path}) => {
+        if (key === '') {return false;}
+        return getFinalBaseStorage(type).exist({key, type, path});
+    },
     
-    get ({key, type}) {
+    get ({key, type, path}) {
+        if (key === '') {return EMPTY;}
         const storage = getFinalBaseStorage(type);
-        const value = storage.get({key, type});
+        const value = storage.get({key, type, path});
         if (type === 'temp' || StorageEnv === 'miniapp') { // 这两种都可以直接存储对象
             return getDataConvert({storageType: type, data: value});
         } else {
@@ -61,21 +69,22 @@ export const Storage: IStorage = {
             return getDataConvert({storageType: type, data});
         }
     },
-    set ({key, value, type = 'local'}) {
+    set ({key, value, path, type = 'local'}) {
+        if (key === '') {return false;}
         const storageValue = setDataConvert({data: value, storageType: type});
         const storage = getFinalBaseStorage(type);
         if (type === 'temp' || StorageEnv === 'miniapp') { // 这两种都可以直接存储对象
-            return storage.set({key, value: storageValue, type});
+            return storage.set({key, value: storageValue, path, type});
         } else {
-            return storage.set({key, value: JSON.stringify(storageValue), type});
+            return storage.set({key, value: JSON.stringify(storageValue), path, type});
         }
     },
-    all ({type} = {}) {
-        const keys = this.keys({type});
+    all ({type, path} = {}) {
+        const keys = this.keys({type, path});
         const data:IJson = {};
         for (let i = 0, length = keys.length; i < length; i++) {
             const key = keys[i];
-            data[key] = this.get({key, type});
+            data[key] = this.get({key, type, path});
         }
         return data;
     },

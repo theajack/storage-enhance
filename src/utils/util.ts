@@ -2,11 +2,12 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:04:32
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-15 15:21:25
+ * @LastEditTime: 2021-12-17 17:48:07
  * @FilePath: /storage-enhance/src/utils/util.ts
  * @Description: Coding something
  */
 
+import {IStorageKeyArg} from 'src/type/storage';
 import {IJson} from '../type/util';
 
 export const isWeb = (() => {
@@ -38,4 +39,17 @@ export function paserJSON (value: string) : object | null {
     } catch (e) {
         return null;
     }
+}
+
+export function buildPathStorageKey ({key, path}: IStorageKeyArg) {
+    if (!path || path === '/') {path = '';}
+    return `${path}/${encodeURIComponent(key)}`;
+}
+
+export function formatStorageKeys (keys: string[]) {
+    return keys.map(key => formatStorageKey(key));
+}
+
+export function formatStorageKey (key: string) {
+    return key.substring(key.lastIndexOf('/') + 1);
 }
