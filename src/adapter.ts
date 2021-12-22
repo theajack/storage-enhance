@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:04:14
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-17 17:29:32
+ * @LastEditTime: 2021-12-22 09:15:41
  * @FilePath: /storage-enhance/src/adapter.ts
  * @Description: Coding something
  */
@@ -15,10 +15,11 @@ import {StorageEnv} from './convert/storage-env';
 import {globalType, setGlobalType} from './convert/storage-type';
 import {TempStorege} from './temp/temp-storage';
 import {TStorageEnv, TStorageType} from './type/constant';
-import {IBaseStorage, IStorage, IStorageData} from './type/storage';
+import {IBaseStorage, IStorage} from './type/storage';
 import {IJson} from './type/util';
-import {paserJSON} from './utils/util';
 import {EMPTY} from './utils/constant';
+import {executePluginsGet, executePluginsSet, getPlugins, usePlugin} from './plugin';
+import {TimesPlugin} from './options/times';
 
 const StorageMap: {
     [prod in TStorageEnv]: IBaseStorage
@@ -35,6 +36,8 @@ function getFinalBaseStorage (type: TStorageType = globalType()): IBaseStorage {
 }
 
 export const Storage: IStorage = {
+    use: usePlugin,
+    plugins: getPlugins,
     env: StorageEnv,
     type: (type) => {
         if (type) {
@@ -55,29 +58,31 @@ export const Storage: IStorage = {
         return getFinalBaseStorage(type).exist({key, type, path});
     },
     
-    get ({key, type, path}) {
+    get (options) {
+        const {key, path, type = 'local'} = options;
+
         if (key === '') {return EMPTY;}
         const storage = getFinalBaseStorage(type);
-        const value = storage.get({key, type, path});
-        if (type === 'temp' || StorageEnv === 'miniapp') { // 这两种都可以直接存储对象
-            return getDataConvert({storageType: type, data: value});
-        } else {
-            const data = paserJSON(value) as (IStorageData | null);
-            if (!data) {
-                return value;
-            }
-            return getDataConvert({storageType: type, data});
-        }
+        let data = storage.get({key, type, path});
+        if (typeof data === 'string' || typeof data === 'symbol') return data;
+        
+        data = executePluginsGet({options, data, storage});
+        if (typeof data === 'symbol') return EMPTY;
+
+        return getDataConvert({storageType: type, data});
     },
-    set ({key, value, path, type = 'local'}) {
+    set (options) {
+        const {key, value, path, type = 'local'} = options;
+
         if (key === '') {return false;}
-        const storageValue = setDataConvert({data: value, storageType: type});
+        let data = setDataConvert({data: value, storageType: type});
         const storage = getFinalBaseStorage(type);
-        if (type === 'temp' || StorageEnv === 'miniapp') { // 这两种都可以直接存储对象
-            return storage.set({key, value: storageValue, path, type});
-        } else {
-            return storage.set({key, value: JSON.stringify(storageValue), path, type});
-        }
+
+        const setResult = executePluginsSet({options, data, storage});
+        if (typeof setResult === 'boolean') return setResult;
+        data = setResult;
+
+        return storage.set({key, value: data, path, type});
     },
     all ({type, path} = {}) {
         const keys = this.keys({type, path});
@@ -89,3 +94,5 @@ export const Storage: IStorage = {
         return data;
     },
 };
+
+Storage.use(TimesPlugin);

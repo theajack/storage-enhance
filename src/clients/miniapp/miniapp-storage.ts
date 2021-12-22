@@ -2,13 +2,13 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:47:42
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-17 17:53:41
+ * @LastEditTime: 2021-12-22 08:56:07
  * @FilePath: /storage-enhance/src/clients/miniapp/miniapp-storage.ts
  * @Description: Coding something
  */
 
 import {IJson} from '../../type/util';
-import {IBaseStorage} from '../../type/storage';
+import {IBaseStorage, IStorageData} from '../../type/storage';
 import {buildPathStorageKey, formatStorageKeys} from '../../utils/util';
 
 export const MiniAppStorage: IBaseStorage = {
@@ -58,7 +58,7 @@ export const MiniAppStorage: IBaseStorage = {
         }
     },
     all ({path} = {}) {
-        const data: IJson<string | null> = {};
+        const data: IJson<string | symbol | IStorageData> = {};
         const keys = this.keys({path});
         for (let i = 0, length = keys.length; i < length; i++) {
             const key = keys[i];

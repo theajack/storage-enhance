@@ -6,9 +6,10 @@
  * @Description: Coding something
  */
 import {StorageEnv} from '../../convert/storage-env';
-import {IBaseStorage, IStorageKeyArg} from '../../type/storage';
+import {IBaseStorage, IStorageData, IStorageKeyArg} from '../../type/storage';
 import {IFS, IPath} from '../../type/node';
 import {EMPTY} from '../../utils/constant';
+import {parseJSON} from '../../utils/util';
 
 let fs: IFS = {} as IFS;
 let path: IPath = {} as IPath;
@@ -40,12 +41,16 @@ export const NodeStorege: IBaseStorage = {
         return fs.existsSync(filePath);
     },
     get ({key, path}) {
-        return readFileBase({key, path});
+        const value = readFileBase({key, path});
+        if (value === EMPTY) return value;
+        const data = parseJSON(value);
+        if (data === null) return value;
+        return data as IStorageData;
     },
     set ({key, value, path}) {
         const filePath = buildFilePath({key, path});
         console.log(filePath);
-        fs.writeFileSync(filePath, value);
+        fs.writeFileSync(filePath, JSON.stringify(value));
         return true;
     },
     remove ({key, path}) {

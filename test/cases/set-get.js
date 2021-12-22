@@ -1,8 +1,28 @@
-module.exports = {
-    name: '测试times参数',
+module.exports = [{
+    name: '测试string',
     test ({storage}) {
-        storage.set({key: 'aaa', value: {a: 1}});
-        return storage.get({key: 'aaa'});
+        const key = 'k1';
+        const value = 'string test';
+        storage.set({key, value});
+        return storage.get({key});
     },
-    expect: {a: 1},
-};
+    expect: 'string test',
+}, {
+    name: '测试boolean',
+    test ({storage}) {
+        const key = 'k2';
+        const value = true;
+        storage.set({key, value});
+        return storage.get({key});
+    },
+    expect: true,
+}, {
+    name: '测试boolean',
+    test ({storage}) {
+        const key = 'k2';
+        const value = true;
+        storage.set({key, value});
+        return storage.get({key});
+    },
+    expect: true,
+}];

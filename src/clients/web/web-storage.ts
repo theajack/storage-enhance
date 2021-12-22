@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:47:42
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-17 17:53:29
+ * @LastEditTime: 2021-12-22 08:55:21
  * @FilePath: /storage-enhance/src/clients/web/web-storage.ts
  * @Description: Coding something
  */
@@ -10,9 +10,9 @@
 import {globalType} from '../../convert/storage-type';
 import {TStorageType} from '../../type/constant';
 import {IJson} from '../../type/util';
-import {IBaseStorage} from '../../type/storage';
-import {buildPathStorageKey, formatStorageKeys} from '../../utils/util';
-
+import {IBaseStorage, IStorageData} from '../../type/storage';
+import {buildPathStorageKey, formatStorageKeys, parseJSON} from '../../utils/util';
+import {EMPTY} from '../../utils/constant';
 
 export const WebStorage: IBaseStorage = {
     length ({type, path} = {}) {
@@ -28,12 +28,16 @@ export const WebStorage: IBaseStorage = {
     },
     get ({key, type, path}) {
         key = buildPathStorageKey({key, path});
-        return getStorageType(type).getItem(key);
+        const value = getStorageType(type).getItem(key);
+        if (value === null) return EMPTY;
+        const data = parseJSON(value);
+        if (data === null) return value;
+        return data as IStorageData;
     },
     set ({key, value, type, path}) {
         try {
             key = buildPathStorageKey({key, path});
-            getStorageType(type).setItem(key, value);
+            getStorageType(type).setItem(key, JSON.stringify(value));
             return true;
         } catch (e) {
             return false;

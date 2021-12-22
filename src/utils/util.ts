@@ -33,7 +33,7 @@ export function deepClone (value: any) {
     return objClone;
 }
 
-export function paserJSON (value: string) : object | null {
+export function parseJSON (value: string) : object | null {
     try {
         return JSON.parse(value);
     } catch (e) {
