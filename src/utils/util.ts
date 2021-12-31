@@ -2,13 +2,14 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:04:32
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-17 17:48:07
+ * @LastEditTime: 2021-12-23 09:16:01
  * @FilePath: /storage-enhance/src/utils/util.ts
  * @Description: Coding something
  */
 
-import {IStorageKeyArg} from 'src/type/storage';
+import {IStorageData, IStorageKeyArg, TGetReturn} from 'src/type/storage';
 import {IJson} from '../type/util';
+import {EMPTY} from './constant';
 
 export const isWeb = (() => {
     return typeof window === 'object' && !!window && !isUndf(window.localStorage);
@@ -52,4 +53,15 @@ export function formatStorageKeys (keys: string[]) {
 
 export function formatStorageKey (key: string) {
     return key.substring(key.lastIndexOf('/') + 1);
+}
+
+export function countExpiresWithMs (ms: number): number {
+    return Date.now() + ms;
+}
+
+export function parseStorageValue (value: symbol | string | null): TGetReturn {
+    if (value === null || typeof value === 'symbol') return EMPTY;
+    const data = parseJSON(value);
+    if (data === null) return value;
+    return data as IStorageData;
 }

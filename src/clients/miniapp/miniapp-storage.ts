@@ -12,6 +12,7 @@ import {IBaseStorage, IStorageData} from '../../type/storage';
 import {buildPathStorageKey, formatStorageKeys} from '../../utils/util';
 
 export const MiniAppStorage: IBaseStorage = {
+    name: 'miniapp',
     length ({path} = {}) {
         return this.keys({path}).length;
     },

@@ -6,22 +6,32 @@
  * @Description: Coding something
  */
 import {
-    IStorageTypeArg, IStorageKeyArg, IStorageSetValueArg, IStorageData, IBaseStorage,
+    IStorageTypeArg, IStorageKeyArg, IStorageData, IBaseStorage, IStorageCommonSetOption, TGetReturn, IStorageRemoveArg,
 } from './storage';
 import {IJson} from './util';
 
-export type TPluginName = 'times' | 'onget' | 'onset' | 'onremove' | 'compress' | 'encode';
+export type TPluginName = 'times' | 'expires' | 'event' | 'compress' | 'encode' | 'final' | 'protect';
 
 interface IPluginGetOptions {
     options: IStorageKeyArg;
     data: IStorageData;
     storage: IBaseStorage;
+    onFinalData(
+        callback: (data: any)=>void
+    ): void;
 }
 
 interface IPluginSetOptions {
-    options: IStorageSetValueArg;
+    options: IStorageCommonSetOption;
     data: IStorageData;
     storage: IBaseStorage;
+    prevData: TGetReturn;
+}
+
+interface IPluginRemoveOptions {
+    options: IStorageRemoveArg;
+    storage: IBaseStorage;
+    prevData: TGetReturn;
 }
 
 export interface IStoragePlugin {
@@ -31,7 +41,7 @@ export interface IStoragePlugin {
     all?(options?: IStorageTypeArg): IJson;
     clear?(options?: IStorageTypeArg): boolean;
     get?(options: IPluginGetOptions): IStorageData | symbol;
-    remove?(options: IStorageKeyArg): boolean;
+    remove?(options: IPluginRemoveOptions): boolean;
     exist?(options: IStorageKeyArg): boolean;
     set?(options: IPluginSetOptions): IStorageData | boolean;
 }

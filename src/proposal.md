@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:43:25
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-14 07:45:12
+ * @LastEditTime: 2021-12-31 08:45:12
  * @FilePath: /storage-enhance/src/proposal.md
  * @Description: Coding something
 -->
@@ -16,5 +16,7 @@
 7. 支持存取异常抛出错误
 8. 支事件监听
 9. 支持path
-10. 支持加密存储
-11. 支持压缩存储
+10. 支持cookie
+11. 支持final、protect
+12. 支持加密存储 todo
+13. 支持压缩存储 todo

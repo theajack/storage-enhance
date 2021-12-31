@@ -1,9 +1,11 @@
 const start = require('./test');
 const storage = require('../src/index').default;
 // const storage = require('../public/node-dev.min'); // 使用build好的文件
-
+window.storage = storage;
 const caseFiles = [
-    'set-get'
+    'set-get',
+    'event',
+    'final',
 ];
 
 const cases = [];

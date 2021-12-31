@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:04:14
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-22 09:15:41
+ * @LastEditTime: 2021-12-31 09:08:16
  * @FilePath: /storage-enhance/src/adapter.ts
  * @Description: Coding something
  */
@@ -15,11 +15,17 @@ import {StorageEnv} from './convert/storage-env';
 import {globalType, setGlobalType} from './convert/storage-type';
 import {TempStorege} from './temp/temp-storage';
 import {TStorageEnv, TStorageType} from './type/constant';
-import {IBaseStorage, IStorage} from './type/storage';
-import {IJson} from './type/util';
+import {IBaseStorage, IStorage, IStorageCommonSetOption, IStorageData, IStorageKeyArg, IStorageRemoveArg, TGetReturn} from './type/storage';
 import {EMPTY} from './utils/constant';
-import {executePluginsGet, executePluginsSet, getPlugins, usePlugin} from './plugin';
+import {executePluginsGet, executePluginsRemove, executePluginsSet, getPlugins, usePlugin} from './plugin';
 import {TimesPlugin} from './options/times';
+import {CookieStorage} from './clients/web/cookie-storage';
+import {ExpiresPlugin} from './options/expires';
+import {EventPlugin} from './options/event';
+import {getScope, registScope} from './utils/scope';
+import {FinalPlugin} from './options/final';
+import {ProtectPlugin} from './options/protect';
+import {IJson} from './type/util';
 
 const StorageMap: {
     [prod in TStorageEnv]: IBaseStorage
@@ -32,12 +38,29 @@ const StorageMap: {
 const BaseStorage: IBaseStorage = StorageMap[StorageEnv];
 
 function getFinalBaseStorage (type: TStorageType = globalType()): IBaseStorage {
+    if (StorageEnv === 'web' && type === 'cookie') return CookieStorage;
     return (type === 'temp' || (StorageEnv !== 'web' && type !== 'local')) ? TempStorege : BaseStorage; // 除了web之外 session 采用 temp 替代
+}
+
+function buildFinalCallback () {
+    let finalCallback: null | Function = null;
+    const onFinalData = (callback: Function) => {
+        finalCallback = callback;
+    };
+
+    return {
+        onFinalData,
+        trigFinalData (finalData: any) {
+            if (typeof finalCallback === 'function') (finalCallback as Function)(finalData);
+        }
+    };
 }
 
 export const Storage: IStorage = {
     use: usePlugin,
     plugins: getPlugins,
+    registScope,
+    scope: getScope,
     env: StorageEnv,
     type: (type) => {
         if (type) {
@@ -47,52 +70,147 @@ export const Storage: IStorage = {
         }
     },
     length: ({type, path} = {}) => getFinalBaseStorage(type).length({type, path}),
-    clear: ({type, path} = {}) => getFinalBaseStorage(type).clear({type, path}),
+    clear (options = {}) {
+        const {type, path, domain} = options;
+        const storage = getFinalBaseStorage(type);
+
+        const keys = this.keys(options);
+        const protects: IJson<IStorageData> = {};
+        for (const key in keys) { // 执行remove插件
+
+            const {result, prevData} = onRemoveData({
+                getOption: {key, type, path},
+                storage,
+                removeOption: {key, domain}
+            });
+            if (result === false && typeof prevData === 'object') {
+                protects[key] = prevData;
+            };
+        }
+
+        const clearResult = storage.clear({type, path, domain});
+
+        for (const key in protects) { // 对remove失败的重新写入
+            this.set({key, value: protects[key].value, type, path});
+        }
+
+        return clearResult;
+    },
     keys: ({type, path} = {}) => getFinalBaseStorage(type).keys({type, path}),
-    remove: ({key, type, path}) => {
+    remove: (options) => {
+        const {key, type, path, domain} = options;
         if (key === '') {return true;}
-        return getFinalBaseStorage(type).remove({key, type, path});
+        const storage = getFinalBaseStorage(type);
+
+        const {result} = onRemoveData({
+            getOption: {key, type, path},
+            storage,
+            removeOption: options
+        });
+        if (result === false) return false;
+        
+        return storage.remove({key, type, path, domain});
     },
     exist: ({key, type, path}) => {
         if (key === '') {return false;}
         return getFinalBaseStorage(type).exist({key, type, path});
     },
-    
-    get (options) {
-        const {key, path, type = 'local'} = options;
-
-        if (key === '') {return EMPTY;}
-        const storage = getFinalBaseStorage(type);
-        let data = storage.get({key, type, path});
-        if (typeof data === 'string' || typeof data === 'symbol') return data;
+    set (arg1, arg2) {
+        if (arg1 instanceof Array) {
+            let result: boolean = true;
+            for (const k in arg1) {
+                if (!this.set(arg1[k])) result = false;
+            }
+            return result;
+        }
         
-        data = executePluginsGet({options, data, storage});
-        if (typeof data === 'symbol') return EMPTY;
-
-        return getDataConvert({storageType: type, data});
-    },
-    set (options) {
-        const {key, value, path, type = 'local'} = options;
+        const options: IStorageCommonSetOption =
+         (typeof arg1 === 'object') ? arg1 : {key: arg1, value: arg2};
+         
+        const {key, value, type, path} = options;
 
         if (key === '') {return false;}
-        let data = setDataConvert({data: value, storageType: type});
+        const data = setDataConvert({data: value, storageType: type});
         const storage = getFinalBaseStorage(type);
 
-        const setResult = executePluginsSet({options, data, storage});
+        const prevData = storage.get({key, type, path});
+        const setResult = executePluginsSet({options, data, storage, prevData});
         if (typeof setResult === 'boolean') return setResult;
-        data = setResult;
+        options.value = setResult;
+        console.log('executePluginsSet result', data);
 
-        return storage.set({key, value: data, path, type});
+        return storage.set(options);
+    },
+    
+    get (arg) {
+        if (arg instanceof Array) {
+            const result: any[] = [];
+            for (const k in arg) {
+                result.push(this.get(arg[k]));
+            }
+            return result;
+        }
+        const options: IStorageKeyArg = (typeof arg === 'object') ? arg : {key: arg};
+        const {key, type, path} = options;
+        if (key === '') {return EMPTY;}
+        const storage = getFinalBaseStorage(type);
+        const data = storage.get({key, type, path});
+
+        return onGetSingleData({options, data, storage});
     },
     all ({type, path} = {}) {
-        const keys = this.keys({type, path});
-        const data:IJson = {};
-        for (let i = 0, length = keys.length; i < length; i++) {
-            const key = keys[i];
-            data[key] = this.get({key, type, path});
+        const storage = getFinalBaseStorage(type);
+        const data = storage.all({type, path});
+        for (const key in data) {
+            if (typeof data[key] === 'object') {
+                const storageData = (data[key] as IStorageData);
+
+                data[key] = onGetSingleData({
+                    options: {key, type, path},
+                    data: storageData,
+                    storage,
+                });
+            }
         }
         return data;
     },
 };
 
-Storage.use(TimesPlugin);
+function onGetSingleData ({ // 复用 get 方法触发事件的逻辑和转换finalData的逻辑 供 get与all方法复用
+    options, data, storage
+}:{
+    options: IStorageKeyArg;
+    data: TGetReturn;
+    storage: IBaseStorage;
+}): TGetReturn {
+    if (typeof data === 'string' || typeof data === 'symbol') return data;
+
+    const {onFinalData, trigFinalData} = buildFinalCallback();
+    data = executePluginsGet({options, data, storage, onFinalData});
+    if (typeof data === 'symbol') return EMPTY;
+    const finalData = getDataConvert({storageType: options.type, data});
+    trigFinalData(finalData);
+    return finalData;
+}
+
+function onRemoveData ({
+    getOption,
+    storage,
+    removeOption
+}: {
+    getOption: IStorageKeyArg;
+    storage: IBaseStorage;
+    removeOption: IStorageRemoveArg;
+}) {
+    const prevData = storage.get(getOption);
+    const result = executePluginsRemove({options: removeOption, storage, prevData});
+    return {result, prevData};
+}
+
+Storage.use(
+    FinalPlugin,
+    ProtectPlugin,
+    TimesPlugin,
+    ExpiresPlugin,
+    EventPlugin
+);

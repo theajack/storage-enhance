@@ -2,19 +2,37 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:47:42
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-22 08:55:21
+ * @LastEditTime: 2021-12-23 09:15:12
  * @FilePath: /storage-enhance/src/clients/web/web-storage.ts
  * @Description: Coding something
  */
 
 import {globalType} from '../../convert/storage-type';
 import {TStorageType} from '../../type/constant';
+import {IStorageTypeArg} from '../../type/storage';
 import {IJson} from '../../type/util';
-import {IBaseStorage, IStorageData} from '../../type/storage';
-import {buildPathStorageKey, formatStorageKeys, parseJSON} from '../../utils/util';
-import {EMPTY} from '../../utils/constant';
+import {IBaseStorage, TGetReturn} from '../../type/storage';
+import {buildPathStorageKey, formatStorageKeys, parseStorageValue} from '../../utils/util';
+
+function getWebStorageKeys ({type, path}: IStorageTypeArg): {
+    originKeys: string[],
+    keys: string[],
+} {
+    const keys = Object.keys(getStorageType(type));
+    if (!path) return {
+        originKeys: keys,
+        keys: formatStorageKeys(keys)
+    };
+    if (path[path.length - 1] !== '/') {path = (path + '/');}
+    const originKeys = keys.filter(key => (key.indexOf(path as string) === 0));
+    return {
+        originKeys,
+        keys: formatStorageKeys(originKeys)
+    };
+}
 
 export const WebStorage: IBaseStorage = {
+    name: 'web',
     length ({type, path} = {}) {
         const storage = getStorageType(type);
         if (!path)
@@ -22,17 +40,12 @@ export const WebStorage: IBaseStorage = {
         return Object.keys(storage).filter(key => key.indexOf(path) === 0).length;
     },
     keys ({type, path} = {}) {
-        const keys = Object.keys(getStorageType(type));
-        if (!path) return formatStorageKeys(keys);
-        return formatStorageKeys(keys.filter(key => key.indexOf(path) === 0));
+        return getWebStorageKeys({type, path}).keys;
     },
     get ({key, type, path}) {
         key = buildPathStorageKey({key, path});
         const value = getStorageType(type).getItem(key);
-        if (value === null) return EMPTY;
-        const data = parseJSON(value);
-        if (data === null) return value;
-        return data as IStorageData;
+        return parseStorageValue(value);
     },
     set ({key, value, type, path}) {
         try {
@@ -68,12 +81,14 @@ export const WebStorage: IBaseStorage = {
         }
     },
     all ({type, path} = {}) {
-        const data: IJson<string | null> = {};
+        const data: IJson<TGetReturn> = {};
+        const {originKeys, keys} = getWebStorageKeys({type, path});
+
         const storage = getStorageType(type);
-        const keys = this.keys({type, path});
         for (let i = 0, length = keys.length; i < length; i++) {
             const key = keys[i];
-            data[key] = storage.getItem(key);
+            const value = storage.getItem(originKeys[i]);
+            data[key] = parseStorageValue(value);
         }
         return data;
     },

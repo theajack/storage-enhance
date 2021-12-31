@@ -6,10 +6,11 @@
  * @Description: Coding something
  */
 import {StorageEnv} from '../../convert/storage-env';
-import {IBaseStorage, IStorageData, IStorageKeyArg} from '../../type/storage';
+import {IBaseStorage, IStorageKeyArg, TGetReturn} from '../../type/storage';
 import {IFS, IPath} from '../../type/node';
 import {EMPTY} from '../../utils/constant';
-import {parseJSON} from '../../utils/util';
+import {parseStorageValue} from '../../utils/util';
+import {IJson} from 'src/type/util';
 
 let fs: IFS = {} as IFS;
 let path: IPath = {} as IPath;
@@ -29,6 +30,7 @@ if (StorageEnv === 'node') {
 }
 
 export const NodeStorege: IBaseStorage = {
+    name: 'node',
     length ({path} = {}) {
         return this.keys({path}).length;
     },
@@ -42,10 +44,7 @@ export const NodeStorege: IBaseStorage = {
     },
     get ({key, path}) {
         const value = readFileBase({key, path});
-        if (value === EMPTY) return value;
-        const data = parseJSON(value);
-        if (data === null) return value;
-        return data as IStorageData;
+        return parseStorageValue(value);
     },
     set ({key, value, path}) {
         const filePath = buildFilePath({key, path});
@@ -67,9 +66,14 @@ export const NodeStorege: IBaseStorage = {
     },
     all ({path} = {}) {
         const keys = this.keys({path});
-        return keys.map(key => {
-            return readFileBase({key, check: false, filePath: resolvePath(key, path)});
-        });
+        const data: IJson<TGetReturn> = {};
+        for (let i = 0, length = keys.length; i < length; i++) {
+            const key = keys[i];
+            data[key] = parseStorageValue(
+                readFileBase({key, check: false, filePath: resolvePath(key, path)})
+            );
+        }
+        return data;
     },
     clear ({path} = {}) {
         const filePath = buildFilePath({key: '', path});

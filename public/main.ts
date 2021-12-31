@@ -7,6 +7,6 @@ declare global {
 
 window.storage = storage;
 
-storage.set({key: 'aa', value: {a: 1}});
+// storage.set({key: 'aa', value: {a: 1}});
 
-window.getStorage = (key: string) => storage.get({key});
+// window.getStorage = (key: string) => storage.get({key});

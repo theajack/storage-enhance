@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-14 08:36:01
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-17 16:55:59
+ * @LastEditTime: 2021-12-24 08:43:12
  * @FilePath: /storage-enhance/src/convert/value-convert.ts
  * @Description: Coding something
  */
@@ -13,7 +13,7 @@ const ValueConvertMap: {
     [prop in TStorageDataType]?: IValueConverter
 } = {
     'function': {
-        set: (v) => `return ${v.toString()};`,
+        set: (v) => `return (${v.toString()});`,
         get: (v) => ((new Function(v))()),
     },
     'reg': {

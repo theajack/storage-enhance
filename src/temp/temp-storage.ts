@@ -50,6 +50,7 @@ function oprateStorageMap (path: string = '', type: TTempMapOprateType = 'get'):
 }
 
 export const TempStorege: IBaseStorage = {
+    name: 'temp',
     length ({path} = {}) {
         return this.keys({path}).length;
     },

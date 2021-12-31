@@ -1,15 +1,16 @@
-import {TStorageEnv, TStorageType} from './constant';
-import {IStoragePlugin} from './plugin';
-import {IJson} from './util';
-
 /*
  * @Author: tackchen
  * @Date: 2021-12-12 14:30:47
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-22 09:15:53
+ * @LastEditTime: 2021-12-31 09:07:29
  * @FilePath: /storage-enhance/src/type/storage.d.ts
  * @Description: Coding something
  */
+import {TStorageEnv, TStorageName, TStorageType} from './constant';
+import {ICookieDomain, ICookieOption} from './cookie';
+import {IStoragePlugin} from './plugin';
+import {IJson} from './util';
+
 export type TStorageKey = string;
 
 export interface IStorageTypeArg {
@@ -17,35 +18,39 @@ export interface IStorageTypeArg {
     path?: string;
 }
 
+export interface IStorageClearArg extends IStorageTypeArg, ICookieDomain {
+}
+
 export interface IStorageKeyArg extends IStorageTypeArg {
     key: TStorageKey;
 }
 
-export interface IStorageSetValueArg extends IStorageKeyArg {
-    value: any;
-    times?: number;
-    once?: boolean;
+export interface IStorageRemoveArg extends IStorageKeyArg, ICookieDomain {
 }
 
-export interface IBaseStorageSetValueArg extends IStorageSetValueArg {
+export interface IBaseStorageSetValueArg extends IStorageKeyArg {
     value: IStorageData;
+    cookie?: ICookieOption;
 }
 
-export interface IBaseStorage {
+export interface IBaseStorageFuncs {
     length(options?: IStorageTypeArg): number;
     keys(options?: IStorageTypeArg): string[];
-    all(options?: IStorageTypeArg): IJson;
-    clear(options?: IStorageTypeArg): boolean;
-    get(options: IStorageKeyArg): IStorageData | string | symbol;
-    remove(options: IStorageKeyArg): boolean;
+    all(options?: IStorageTypeArg): IJson<TGetReturn>;
+    clear(options?: IStorageClearArg): boolean;
+    get(options: IStorageKeyArg): TGetReturn;
+    remove(options: IStorageRemoveArg): boolean;
     exist(options: IStorageKeyArg): boolean;
     set(options: IBaseStorageSetValueArg): boolean;
+}
+
+export interface IBaseStorage extends IBaseStorageFuncs {
+    name: TStorageName;
 }
 
 export type TStorageDataType = 'string' | 'bigint' | 'number' | 'boolean' | 'symbol' |
     'undefined' | 'object' | 'function' |
     'html' | 'date' | 'null' | 'reg';
-
 
 export interface IStorageBaseOption {
     value: string | any;
@@ -55,16 +60,24 @@ export interface IStorageBaseOption {
     compress?: boolean; // 是否压缩存储
     encrypt?: boolean; // 是否为加密存储
     path?: string;
+    final?: boolean; // 是否是不可改变的
+    protect?: boolean; // 不可以被删除的
 }
 
 export interface IStorageData extends IStorageBaseOption {
     type: TStorageDataType;
+    onGet?: string;
+    onSet?: string;
+    onRemove?: string;
 }
 
+export type TGetReturn = IStorageData | string | symbol;
+
 export interface IStorageCommonSetOption extends IStorageBaseOption, IStorageKeyArg {
-    onSet?(): void;
-    onGet?(): void;
-    onRemove?(): void;
+    cookie?: ICookieOption;
+    onGet?: string | Function;
+    onSet?: string | Function;
+    onRemove?: string | Function;
 }
 
 export interface IValueConverter {
@@ -74,11 +87,13 @@ export interface IValueConverter {
 
 export type TOprate = 'get' | 'set';
 
-export interface IStorage extends IBaseStorage {
+export interface IStorage extends IBaseStorageFuncs {
     env: TStorageEnv;
+    registScope(arg1: string | IJson, arg2?: any): void;
+    scope(): void;
     type(type?: TStorageType): TStorageType | void;
-    set(options: IStorageCommonSetOption): boolean;
-    get(options: IStorageKeyArg): any;
+    set(options: string | IStorageCommonSetOption | IStorageCommonSetOption[], value?: any): boolean;
+    get(options: string | IStorageKeyArg | IStorageKeyArg[]): any;
     use(...plugins: IStoragePlugin[]): void;
     plugins(): IStoragePlugin[];
 }
