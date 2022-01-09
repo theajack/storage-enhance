@@ -3,7 +3,7 @@
  * @Date: 2021-12-30 08:43:38
  * @LastEditors: tackchen
  * @LastEditTime: 2021-12-30 08:58:16
- * @FilePath: /storage-enhance/src/options/final.ts
+ * @FilePath: /storage-enhance/src/plugins/final.ts
  * @Description: Coding something
  */
 

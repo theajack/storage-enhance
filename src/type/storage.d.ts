@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:30:47
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-31 09:07:29
+ * @LastEditTime: 2022-01-08 12:38:41
  * @FilePath: /storage-enhance/src/type/storage.d.ts
  * @Description: Coding something
  */
@@ -57,8 +57,8 @@ export interface IStorageBaseOption {
     expires?: number; // 过期时间 datetime
     once?: boolean; // 是否是一次性的
     times?: number; // 可读取次数
-    compress?: boolean; // 是否压缩存储
-    encrypt?: boolean; // 是否为加密存储
+    // compress?: boolean; // 是否压缩存储
+    // encrypt?: boolean; // 是否为加密存储
     path?: string;
     final?: boolean; // 是否是不可改变的
     protect?: boolean; // 不可以被删除的
@@ -73,11 +73,21 @@ export interface IStorageData extends IStorageBaseOption {
 
 export type TGetReturn = IStorageData | string | symbol;
 
+export interface IEventOption {
+    scope: IJson<any>;
+    data: any;
+    prevData?: any;
+}
+
+export interface IEvent {
+    (options: IEventOption): void;
+}
+
 export interface IStorageCommonSetOption extends IStorageBaseOption, IStorageKeyArg {
     cookie?: ICookieOption;
-    onGet?: string | Function;
-    onSet?: string | Function;
-    onRemove?: string | Function;
+    onGet?: string | IEvent;
+    onSet?: string | IEvent;
+    onRemove?: string | IEvent;
 }
 
 export interface IValueConverter {
@@ -89,13 +99,14 @@ export type TOprate = 'get' | 'set';
 
 export interface IStorage extends IBaseStorageFuncs {
     env: TStorageEnv;
-    registScope(arg1: string | IJson, arg2?: any): void;
+    registScope(arg1: string | IJson<IEvent | any>, arg2?: IEvent | any): void;
     scope(): void;
     type(type?: TStorageType): TStorageType | void;
     set(options: string | IStorageCommonSetOption | IStorageCommonSetOption[], value?: any): boolean;
     get(options: string | IStorageKeyArg | IStorageKeyArg[]): any;
     use(...plugins: IStoragePlugin[]): void;
     plugins(): IStoragePlugin[];
+    EMPTY: Symbol;
 }
 
 export type TTempMapOprateType = TOprate | 'clear';

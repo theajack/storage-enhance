@@ -2,13 +2,13 @@
  * @Author: tackchen
  * @Date: 2021-12-30 08:54:45
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-30 08:56:32
+ * @LastEditTime: 2022-01-08 12:30:29
  * @FilePath: /storage-enhance/test/cases/final.js
  * @Description: Coding something
  */
 
 module.exports = [{
-    name: '测试final',
+    name: '测试 final',
     test ({storage}) {
         const key = 'final-k1';
         const value = this.expect;
@@ -16,5 +16,5 @@ module.exports = [{
         storage.set({key, value: 'new value'});
         return storage.get({key});
     },
-    expect: 'event final test',
+    expect: 'storage final test',
 }];

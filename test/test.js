@@ -20,18 +20,14 @@ module.exports = ({cases, onComplete, storage}) => {
             log(`测试用例详细数据:`);
             log('----------------------------');
             result.results.forEach(item => {
-                log(`【${item.name}】: ${item.passed ? '' : '不'}通过 / ${item.time}ms`);
-                log(`输出结果: ${JSON.stringify(item.result)}`);
+                let str = `【${item.name}】: ${item.passed ? '' : '不'}通过(${item.time}ms); [输出结果]: ${lib.toString(item.result)};`;
                 if (!item.passed) {
-                    log(`期望结果: ${JSON.stringify(item.expect)}`);
+                    str += `期望结果: ${lib.toString(item.expect)}`;
                 }
-                log();
+                log(str);
             });
+            log('----------------------------');
     
-            console.log(`测试结果: ${result.passed ? '' : '不'}通过`);
-            console.log(`测试用例数: ${result.results.length}`);
-            console.log(`总耗时: ${result.time}ms`);
-            log();
             if (onComplete)
                 onComplete(result, txtContent);
         }

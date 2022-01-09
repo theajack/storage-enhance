@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-14 08:36:01
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-24 08:43:12
+ * @LastEditTime: 2022-01-08 11:55:10
  * @FilePath: /storage-enhance/src/convert/value-convert.ts
  * @Description: Coding something
  */
@@ -18,7 +18,7 @@ const ValueConvertMap: {
     },
     'reg': {
         set: (v) => (v.toString()),
-        get: (v) => new RegExp(v),
+        get: (v) => (new Function(`return ${v}`))(),
     },
     'html': {
         set: (v: HTMLElement) => (v.outerHTML),
@@ -31,6 +31,10 @@ const ValueConvertMap: {
     'date': {
         set: (v: Date) => (v.getTime()),
         get: (v) => new Date(v),
+    },
+    'symbol': {
+        set: (v: Symbol) => (v.toString()),
+        get: (v) => (v.toString()),
     }
 };
 

@@ -2,13 +2,15 @@
  * @Author: tackchen
  * @Date: 2021-12-17 18:50:16
  * @LastEditors: tackchen
- * @FilePath: /storage-enhance/src/options/event.ts
+ * @FilePath: /storage-enhance/src/plugins/event.ts
  * @Description: Coding something
  */
 
 import {IStoragePlugin} from '../type/plugin';
 import {convertValue} from '../convert/value-convert';
 import {getScope} from '../utils/scope';
+import {EMPTY} from '../utils/constant';
+import {IEvent} from '../type/storage';
 
 function stringifyEvent (evt: string | Function): string {
     if (typeof evt === 'string') {
@@ -21,7 +23,7 @@ function stringifyEvent (evt: string | Function): string {
     });
 }
 
-export function parseEvnet (eventStr: string) {
+export function parseEvnet (eventStr: string): IEvent | null {
     if (eventStr.indexOf('@:') === 0) {
         const eventName = eventStr.substring(2);
         const scope = getScope();
@@ -48,11 +50,11 @@ export const EventPlugin: IStoragePlugin = {
             data.onGet = stringifyEvent(options.onGet);
         }
         if (typeof prevData === 'object') { // 触发前一次onSet事件
-            trigEvent(prevData.onSet, data.value);
+            trigEvent(prevData.onSet, data.value, prevData.value);
         }
         if (options.onSet) {
             data.onSet = stringifyEvent(options.onSet);
-            trigEvent(data.onSet, data.value);
+            trigEvent(data.onSet, data.value, EMPTY);
         }
         return data;
     },
@@ -64,12 +66,12 @@ export const EventPlugin: IStoragePlugin = {
     },
 };
 
-function trigEvent (eventStr: string | undefined, data: any) {
+function trigEvent (eventStr: string | undefined, data: any, prevData?: any) {
     if (typeof eventStr === 'undefined') return;
     const event = parseEvnet(eventStr);
     if (event === null) {
         console.warn('Invalid event:', eventStr);
         return;
     }
-    event({scope: getScope(), data});
+    event({scope: getScope(), data, prevData});
 }

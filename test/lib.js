@@ -29,6 +29,13 @@ function registInterceptor ({event, eventName, done}) {
     });
 }
 
+function toString (value) {
+    if (typeof value === 'undefined') return 'undefined';
+    if (value instanceof RegExp || value instanceof Date) return value.toString();
+    if (value instanceof HTMLElement) return value.outerHTML;
+    return typeof value === 'object' ? JSON.stringify(value) : value.toString();
+}
+
 module.exports = {
-    delay, registInterceptor, promise
+    delay, registInterceptor, promise, toString
 };

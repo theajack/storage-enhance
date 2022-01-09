@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:47:42
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-22 08:56:07
+ * @LastEditTime: 2022-01-09 10:54:08
  * @FilePath: /storage-enhance/src/clients/miniapp/miniapp-storage.ts
  * @Description: Coding something
  */
@@ -63,7 +63,7 @@ export const MiniAppStorage: IBaseStorage = {
         const keys = this.keys({path});
         for (let i = 0, length = keys.length; i < length; i++) {
             const key = keys[i];
-            data[key] = this.get({key});
+            data[key] = this.get({key, path});
         }
         return data;
     },

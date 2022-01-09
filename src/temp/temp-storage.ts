@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-12 16:25:06
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-17 18:15:38
+ * @LastEditTime: 2022-01-09 13:46:51
  * @FilePath: /storage-enhance/src/temp/temp-storage.ts
  * @Description: Coding something
  */
@@ -14,6 +14,8 @@ import {
 import {IJson} from '../type/util';
 
 let storageMap: IJson = {};
+
+window.tempMap = storageMap;
 
 function oprateStorageMap (path: string = '', type: TTempMapOprateType = 'get'): IJson | boolean {
     if (!path || path === '/') {

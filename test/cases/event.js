@@ -6,7 +6,7 @@
  * @Description: Coding something
  */
 module.exports = [{
-    name: '测试onGet名称',
+    name: '测试 onGet名称',
     test ({storage}) {
         const key = 'onget-k1';
         const value = this.expect;
@@ -18,9 +18,9 @@ module.exports = [{
             storage.get({key});
         });
     },
-    expect: 'event get test',
+    expect: 'storage get test',
 }, {
-    name: '测试onGet方法',
+    name: '测试 onGet方法',
     test ({storage}) {
         const key = 'onget-k2';
         const value = this.expect;
@@ -34,9 +34,9 @@ module.exports = [{
             storage.get({key});
         });
     },
-    expect: 'event get function test',
+    expect: 'storage get function test',
 }, {
-    name: '测试onGet方法2',
+    name: '测试 onGet方法2',
     test ({storage}) {
         const key = 'onget-k3';
         const value = this.expect;
@@ -46,9 +46,9 @@ module.exports = [{
         storage.get({key});
         return storage.scope().k3;
     },
-    expect: 'event get function test',
+    expect: 'storage get function test',
 }, {
-    name: '测试all onGet方法',
+    name: '测试 all onGet方法',
     test ({storage}) {
         const key = 'onget-k4';
         const value = this.expect;
@@ -58,5 +58,17 @@ module.exports = [{
         storage.all();
         return storage.scope().k4;
     },
-    expect: 'event get all function test',
+    expect: 'storage get all function test',
+}, {
+    name: '测试 onSet方法',
+    test ({storage}) {
+        const key = 'onget-k4';
+        const value = this.expect;
+        storage.set({key, value, onSet: ({scope, data}) => {
+            scope.k4 = data;
+        }});
+        storage.all();
+        return storage.scope().k4;
+    },
+    expect: 'storage get all function test',
 }];

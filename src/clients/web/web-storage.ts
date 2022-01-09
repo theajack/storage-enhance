@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:47:42
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-23 09:15:12
+ * @LastEditTime: 2022-01-08 23:19:46
  * @FilePath: /storage-enhance/src/clients/web/web-storage.ts
  * @Description: Coding something
  */
@@ -97,6 +97,8 @@ export const WebStorage: IBaseStorage = {
         return getStorageType(type).hasOwnProperty(key);
     }
 };
+
+window.wstorage = WebStorage;
 
 function getStorageType (type: TStorageType = globalType()): Storage {
     return type === 'local' ? window.localStorage : window.sessionStorage;

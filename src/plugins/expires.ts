@@ -2,14 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-17 18:50:16
  * @LastEditors: tackchen
- * @FilePath: /storage-enhance/src/options/expires.ts
- * @Description: Coding something
- */
-/*
- * @Author: tackchen
- * @Date: 2021-12-21 11:12:05
- * @LastEditors: tackchen
- * @FilePath: /storage-enhance/src/options/times.ts
+ * @FilePath: /storage-enhance/src/plugins/expires.ts
  * @Description: Coding something
  */
 

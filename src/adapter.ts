@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:04:14
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-31 09:08:16
+ * @LastEditTime: 2022-01-08 23:26:23
  * @FilePath: /storage-enhance/src/adapter.ts
  * @Description: Coding something
  */
@@ -18,13 +18,13 @@ import {TStorageEnv, TStorageType} from './type/constant';
 import {IBaseStorage, IStorage, IStorageCommonSetOption, IStorageData, IStorageKeyArg, IStorageRemoveArg, TGetReturn} from './type/storage';
 import {EMPTY} from './utils/constant';
 import {executePluginsGet, executePluginsRemove, executePluginsSet, getPlugins, usePlugin} from './plugin';
-import {TimesPlugin} from './options/times';
+import {TimesPlugin} from './plugins/times';
 import {CookieStorage} from './clients/web/cookie-storage';
-import {ExpiresPlugin} from './options/expires';
-import {EventPlugin} from './options/event';
+import {ExpiresPlugin} from './plugins/expires';
+import {EventPlugin} from './plugins/event';
 import {getScope, registScope} from './utils/scope';
-import {FinalPlugin} from './options/final';
-import {ProtectPlugin} from './options/protect';
+import {FinalPlugin} from './plugins/final';
+import {ProtectPlugin} from './plugins/protect';
 import {IJson} from './type/util';
 
 const StorageMap: {
@@ -57,6 +57,7 @@ function buildFinalCallback () {
 }
 
 export const Storage: IStorage = {
+    EMPTY,
     use: usePlugin,
     plugins: getPlugins,
     registScope,
@@ -76,8 +77,8 @@ export const Storage: IStorage = {
 
         const keys = this.keys(options);
         const protects: IJson<IStorageData> = {};
-        for (const key in keys) { // 执行remove插件
-
+        for (let i = 0, length = keys.length; i < length; i++) { // 执行remove插件
+            const key = keys[i];
             const {result, prevData} = onRemoveData({
                 getOption: {key, type, path},
                 storage,
@@ -203,6 +204,7 @@ function onRemoveData ({
     removeOption: IStorageRemoveArg;
 }) {
     const prevData = storage.get(getOption);
+    console.warn('[prev]', prevData, getOption, removeOption);
     const result = executePluginsRemove({options: removeOption, storage, prevData});
     return {result, prevData};
 }
