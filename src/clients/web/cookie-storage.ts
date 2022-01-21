@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-22 09:21:03
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-22 23:06:35
+ * @LastEditTime: 2022-01-09 18:27:56
  * @FilePath: /storage-enhance/src/clients/web/cookie-storage.ts
  * @Description: Coding something
  */
@@ -26,7 +26,7 @@ export const CookieStorage: IBaseStorage = {
         });
     },
     get ({key, path}) {
-        if (!Cookie.checkPath(path)) return EMPTY;
+        if (!Cookie.checkPath(path)) return EMPTY; // ! cookie获取不到其他path的数据
         const value = Cookie.get({key});
         return parseStorageValue(value);
     },

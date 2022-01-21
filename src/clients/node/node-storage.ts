@@ -9,7 +9,7 @@ import {StorageEnv} from '../../convert/storage-env';
 import {IBaseStorage, IStorageKeyArg, TGetReturn} from '../../type/storage';
 import {IFS, IPath} from '../../type/node';
 import {EMPTY} from '../../utils/constant';
-import {parseStorageValue} from '../../utils/util';
+import {addIntoAllData, parseStorageValue} from '../../utils/util';
 import {IJson} from 'src/type/util';
 
 let fs: IFS = {} as IFS;
@@ -69,9 +69,10 @@ export const NodeStorege: IBaseStorage = {
         const data: IJson<TGetReturn> = {};
         for (let i = 0, length = keys.length; i < length; i++) {
             const key = keys[i];
-            data[key] = parseStorageValue(
+            const storageData = parseStorageValue(
                 readFileBase({key, check: false, filePath: resolvePath(key, path)})
             );
+            addIntoAllData({data, key, storageData});
         }
         return data;
     },

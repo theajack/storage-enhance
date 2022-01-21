@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:04:14
  * @LastEditors: tackchen
- * @LastEditTime: 2022-01-08 23:26:23
+ * @LastEditTime: 2022-01-09 18:00:44
  * @FilePath: /storage-enhance/src/adapter.ts
  * @Description: Coding something
  */
@@ -15,7 +15,7 @@ import {StorageEnv} from './convert/storage-env';
 import {globalType, setGlobalType} from './convert/storage-type';
 import {TempStorege} from './temp/temp-storage';
 import {TStorageEnv, TStorageType} from './type/constant';
-import {IBaseStorage, IStorage, IStorageCommonSetOption, IStorageData, IStorageKeyArg, IStorageRemoveArg, TGetReturn} from './type/storage';
+import {IAdapterStorageKeyArg, IBaseStorage, IStorage, IStorageCommonSetOption, IStorageData, IStorageDetailArg, IStorageKeyArg, IStorageRemoveArg, TGetReturn} from './type/storage';
 import {EMPTY} from './utils/constant';
 import {executePluginsGet, executePluginsRemove, executePluginsSet, getPlugins, usePlugin} from './plugin';
 import {TimesPlugin} from './plugins/times';
@@ -131,7 +131,7 @@ export const Storage: IStorage = {
         const {key, value, type, path} = options;
 
         if (key === '') {return false;}
-        const data = setDataConvert({data: value, storageType: type});
+        const data = setDataConvert({data: value, storageType: type, path});
         const storage = getFinalBaseStorage(type);
 
         const prevData = storage.get({key, type, path});
@@ -151,15 +151,16 @@ export const Storage: IStorage = {
             }
             return result;
         }
-        const options: IStorageKeyArg = (typeof arg === 'object') ? arg : {key: arg};
-        const {key, type, path} = options;
+        const options: IAdapterStorageKeyArg = (typeof arg === 'object') ? arg : {key: arg};
+        const {key, type, path, detail} = options;
         if (key === '') {return EMPTY;}
         const storage = getFinalBaseStorage(type);
         const data = storage.get({key, type, path});
+        console.log('BaseStorage', data);
 
-        return onGetSingleData({options, data, storage});
+        return onGetSingleData({options, data, storage, detail});
     },
-    all ({type, path} = {}) {
+    all ({type, path, detail} = {}) {
         const storage = getFinalBaseStorage(type);
         const data = storage.all({type, path});
         for (const key in data) {
@@ -170,6 +171,7 @@ export const Storage: IStorage = {
                     options: {key, type, path},
                     data: storageData,
                     storage,
+                    detail,
                 });
             }
         }
@@ -178,12 +180,12 @@ export const Storage: IStorage = {
 };
 
 function onGetSingleData ({ // 复用 get 方法触发事件的逻辑和转换finalData的逻辑 供 get与all方法复用
-    options, data, storage
+    options, data, storage, detail = false
 }:{
-    options: IStorageKeyArg;
+    options: IAdapterStorageKeyArg;
     data: TGetReturn;
     storage: IBaseStorage;
-}): TGetReturn {
+} & IStorageDetailArg): TGetReturn {
     if (typeof data === 'string' || typeof data === 'symbol') return data;
 
     const {onFinalData, trigFinalData} = buildFinalCallback();
@@ -191,7 +193,7 @@ function onGetSingleData ({ // 复用 get 方法触发事件的逻辑和转换fi
     if (typeof data === 'symbol') return EMPTY;
     const finalData = getDataConvert({storageType: options.type, data});
     trigFinalData(finalData);
-    return finalData;
+    return detail ? data : finalData;
 }
 
 function onRemoveData ({

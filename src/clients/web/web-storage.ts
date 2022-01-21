@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:47:42
  * @LastEditors: tackchen
- * @LastEditTime: 2022-01-08 23:19:46
+ * @LastEditTime: 2022-01-09 18:24:52
  * @FilePath: /storage-enhance/src/clients/web/web-storage.ts
  * @Description: Coding something
  */
@@ -12,7 +12,7 @@ import {TStorageType} from '../../type/constant';
 import {IStorageTypeArg} from '../../type/storage';
 import {IJson} from '../../type/util';
 import {IBaseStorage, TGetReturn} from '../../type/storage';
-import {buildPathStorageKey, formatStorageKeys, parseStorageValue} from '../../utils/util';
+import {addIntoAllData, buildPathStorageKey, formatStorageKeys, parseStorageValue} from '../../utils/util';
 
 function getWebStorageKeys ({type, path}: IStorageTypeArg): {
     originKeys: string[],
@@ -88,7 +88,8 @@ export const WebStorage: IBaseStorage = {
         for (let i = 0, length = keys.length; i < length; i++) {
             const key = keys[i];
             const value = storage.getItem(originKeys[i]);
-            data[key] = parseStorageValue(value);
+            const storageData = parseStorageValue(value);
+            addIntoAllData({data, key, storageData});
         }
         return data;
     },

@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:04:32
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-23 09:16:01
+ * @LastEditTime: 2022-01-09 18:42:59
  * @FilePath: /storage-enhance/src/utils/util.ts
  * @Description: Coding something
  */
@@ -64,4 +64,25 @@ export function parseStorageValue (value: symbol | string | null): TGetReturn {
     const data = parseJSON(value);
     if (data === null) return value;
     return data as IStorageData;
+}
+
+export function addIntoAllData ({
+    data,
+    key,
+    storageData,
+}: {
+    data: IJson<TGetReturn>;
+    key: string;
+    storageData: TGetReturn;
+}) {
+    if (typeof data[key] !== 'undefined' && typeof storageData === 'object') {
+        if (typeof storageData.path === 'undefined' || storageData.path === '/') {
+            debugger;
+            const pathKey = `${(data[key] as IStorageData).path}/${key}`;
+            data[pathKey] = data[key]; // ! 如果是跟目录且被占用了 则 将根目录交换出来
+        } else {
+            key = `${storageData.path}/${key}`;
+        }
+    }
+    data[key] = storageData;
 }

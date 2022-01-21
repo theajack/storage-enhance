@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:30:47
  * @LastEditors: tackchen
- * @LastEditTime: 2022-01-08 12:38:41
+ * @LastEditTime: 2022-01-09 18:35:25
  * @FilePath: /storage-enhance/src/type/storage.d.ts
  * @Description: Coding something
  */
@@ -18,11 +18,18 @@ export interface IStorageTypeArg {
     path?: string;
 }
 
+export interface IStorageDetailArg {
+    detail?: boolean;
+}
+
 export interface IStorageClearArg extends IStorageTypeArg, ICookieDomain {
 }
 
 export interface IStorageKeyArg extends IStorageTypeArg {
     key: TStorageKey;
+}
+
+export interface IAdapterStorageKeyArg extends IStorageKeyArg, IStorageDetailArg {
 }
 
 export interface IStorageRemoveArg extends IStorageKeyArg, ICookieDomain {
@@ -66,6 +73,7 @@ export interface IStorageBaseOption {
 
 export interface IStorageData extends IStorageBaseOption {
     type: TStorageDataType;
+    path?: string;
     onGet?: string;
     onSet?: string;
     onRemove?: string;
@@ -103,7 +111,8 @@ export interface IStorage extends IBaseStorageFuncs {
     scope(): void;
     type(type?: TStorageType): TStorageType | void;
     set(options: string | IStorageCommonSetOption | IStorageCommonSetOption[], value?: any): boolean;
-    get(options: string | IStorageKeyArg | IStorageKeyArg[]): any;
+    get(options: string | IAdapterStorageKeyArg | IAdapterStorageKeyArg[]): any;
+    all(options?: IStorageTypeArg & IStorageDetailArg): IJson<TGetReturn>;
     use(...plugins: IStoragePlugin[]): void;
     plugins(): IStoragePlugin[];
     EMPTY: Symbol;

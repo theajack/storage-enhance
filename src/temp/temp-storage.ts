@@ -2,17 +2,22 @@
  * @Author: tackchen
  * @Date: 2021-12-12 16:25:06
  * @LastEditors: tackchen
- * @LastEditTime: 2022-01-09 13:46:51
+ * @LastEditTime: 2022-01-09 18:25:47
  * @FilePath: /storage-enhance/src/temp/temp-storage.ts
  * @Description: Coding something
  */
 
-import {deepClone} from '../utils/util';
+import {addIntoAllData, deepClone} from '../utils/util';
 import {
-    IBaseStorage, TTempMapOprateType,
+    IBaseStorage, IStorageData, TTempMapOprateType,
 } from '../type/storage';
 import {IJson} from '../type/util';
+import {EMPTY} from '../utils/constant';
 
+const PathSymbol = Symbol('path');
+
+// 存储 tempStorage 的data
+// /aa/bb/key => storageMap.aa.bb.key
 let storageMap: IJson = {};
 
 window.tempMap = storageMap;
@@ -34,7 +39,7 @@ function oprateStorageMap (path: string = '', type: TTempMapOprateType = 'get'):
         if (!name) {continue;}
         if (!map[name]) {
             if (type === 'set') {
-                map[name] = {};
+                map[name] = {[PathSymbol]: true};
             } else if (type === 'get') {
                 return map;
             } else if (type === 'clear') {
@@ -51,19 +56,64 @@ function oprateStorageMap (path: string = '', type: TTempMapOprateType = 'get'):
     return map;
 }
 
+// 获取某个map里的所有key
+function keysOfMap (map: IJson): string[] {
+    const keys: string[] = [];
+    traverseMap({
+        map,
+        callback: ({key}) => {
+            keys.push(key);
+        }
+    });
+    return keys;
+}
+
+function itemsOfMap (map: IJson): IJson<IStorageData> {
+    const result: IJson<IStorageData> = {};
+    traverseMap({
+        map,
+        callback: ({key, value}) => {
+            addIntoAllData({data: result, key, storageData: value});
+        },
+    });
+    return result;
+}
+
+function traverseMap ({
+    map, callback
+}: {
+    map: IJson;
+    callback: (opt:{key: string, value: any})=>void;
+}) {
+    const mapKeys = Object.keys(map);
+    for (let i = 0, n = mapKeys.length; i < n; i++ ) {
+        const key = mapKeys[i];
+        if (isPathMap(map[key])) { // 如果是路径目录
+            traverseMap({map: map[key], callback});
+        } else {
+            callback({key, value: map[key]});
+        }
+    }
+}
+
+function isPathMap (map: any): boolean {
+    return !!map[PathSymbol];
+}
+
 export const TempStorege: IBaseStorage = {
     name: 'temp',
     length ({path} = {}) {
         return this.keys({path}).length;
     },
     keys ({path} = {}) {
-        return Object.keys(oprateStorageMap(path));
+        return keysOfMap(oprateStorageMap(path) as IJson);
     },
     exist ({key, path}) {
-        return oprateStorageMap(path).hasOwnProperty(key);
+        const map = oprateStorageMap(path);
+        return map.hasOwnProperty(key) && !isPathMap((map as IJson)[key]);
     },
     get ({key, path}) {
-        return this.exist({key}) ? deepClone((oprateStorageMap(path) as IJson)[key]) : null;
+        return this.exist({key}) ? deepClone((oprateStorageMap(path) as IJson)[key]) : EMPTY;
     },
     set ({key, value, path}) {
         (oprateStorageMap(path, 'set') as IJson)[key] = deepClone(value);
@@ -73,8 +123,13 @@ export const TempStorege: IBaseStorage = {
         delete (oprateStorageMap(path) as IJson)[key];
         return true;
     },
-    all ({path} = {}) {return deepClone(oprateStorageMap(path));},
+    all ({path} = {}) {
+        const map = oprateStorageMap(path) as IJson;
+        return deepClone(itemsOfMap(map));
+    },
     clear ({path} = {}) {
         return oprateStorageMap(path, 'clear') as boolean;
     }
 };
+
+window.TempStorege = TempStorege;
