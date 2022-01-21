@@ -2,14 +2,14 @@
  * @Author: tackchen
  * @Date: 2021-12-12 16:25:06
  * @LastEditors: tackchen
- * @LastEditTime: 2022-01-09 18:25:47
+ * @LastEditTime: 2022-01-21 08:51:21
  * @FilePath: /storage-enhance/src/temp/temp-storage.ts
  * @Description: Coding something
  */
 
-import {addIntoAllData, deepClone} from '../utils/util';
+import {buildFinalKey, deepClone} from '../utils/util';
 import {
-    IBaseStorage, IStorageData, TTempMapOprateType,
+    IBaseStorage, IKeyPathPair, IKeyPathReturnPair, IKeyPathValuePair, TTempMapOprateType,
 } from '../type/storage';
 import {IJson} from '../type/util';
 import {EMPTY} from '../utils/constant';
@@ -57,41 +57,50 @@ function oprateStorageMap (path: string = '', type: TTempMapOprateType = 'get'):
 }
 
 // 获取某个map里的所有key
-function keysOfMap (map: IJson): string[] {
-    const keys: string[] = [];
+function keysOfMap (map: IJson): IKeyPathPair[] {
+    const keys: IKeyPathPair[] = [];
     traverseMap({
         map,
-        callback: ({key}) => {
-            keys.push(key);
+        callback: ({key, path}) => {
+            keys.push({key, path});
         }
     });
     return keys;
 }
 
-function itemsOfMap (map: IJson): IJson<IStorageData> {
-    const result: IJson<IStorageData> = {};
+function itemsOfMap (map: IJson): IKeyPathReturnPair[] {
+    const result: IKeyPathReturnPair[] = [];
     traverseMap({
         map,
-        callback: ({key, value}) => {
-            addIntoAllData({data: result, key, storageData: value});
+        callback: ({key, path, value}) => {
+            result.push({
+                key,
+                path,
+                value,
+            });
         },
     });
     return result;
 }
 
 function traverseMap ({
-    map, callback
+    map, path = '/', callback
 }: {
     map: IJson;
-    callback: (opt:{key: string, value: any})=>void;
+    path?: string;
+    callback: (opt: IKeyPathValuePair)=>void;
 }) {
     const mapKeys = Object.keys(map);
     for (let i = 0, n = mapKeys.length; i < n; i++ ) {
         const key = mapKeys[i];
         if (isPathMap(map[key])) { // 如果是路径目录
-            traverseMap({map: map[key], callback});
+            traverseMap({
+                map: map[key],
+                path: buildFinalKey({key, path}),
+                callback
+            });
         } else {
-            callback({key, value: map[key]});
+            callback({key, path, value: map[key]});
         }
     }
 }

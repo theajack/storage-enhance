@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:30:47
  * @LastEditors: tackchen
- * @LastEditTime: 2022-01-09 18:35:25
+ * @LastEditTime: 2022-01-21 08:27:47
  * @FilePath: /storage-enhance/src/type/storage.d.ts
  * @Description: Coding something
  */
@@ -40,10 +40,14 @@ export interface IBaseStorageSetValueArg extends IStorageKeyArg {
     cookie?: ICookieOption;
 }
 
+export interface IKeyPathPair {
+    key: TStorageKey;
+    path: string;
+}
+
 export interface IBaseStorageFuncs {
     length(options?: IStorageTypeArg): number;
-    keys(options?: IStorageTypeArg): string[];
-    all(options?: IStorageTypeArg): IJson<TGetReturn>;
+    keys(options?: IStorageTypeArg): IKeyPathPair[];
     clear(options?: IStorageClearArg): boolean;
     get(options: IStorageKeyArg): TGetReturn;
     remove(options: IStorageRemoveArg): boolean;
@@ -53,6 +57,7 @@ export interface IBaseStorageFuncs {
 
 export interface IBaseStorage extends IBaseStorageFuncs {
     name: TStorageName;
+    all(options?: IStorageTypeArg): IKeyPathReturnPair[];
 }
 
 export type TStorageDataType = 'string' | 'bigint' | 'number' | 'boolean' | 'symbol' |
@@ -81,6 +86,10 @@ export interface IStorageData extends IStorageBaseOption {
 
 export type TGetReturn = IStorageData | string | symbol;
 
+export interface IKeyPathReturnPair extends IKeyPathPair {
+    value: TGetReturn;
+}
+
 export interface IEventOption {
     scope: IJson<any>;
     data: any;
@@ -105,6 +114,9 @@ export interface IValueConverter {
 
 export type TOprate = 'get' | 'set';
 
+export interface IKeyPathValuePair extends IKeyPathPair {
+    value: any;
+}
 export interface IStorage extends IBaseStorageFuncs {
     env: TStorageEnv;
     registScope(arg1: string | IJson<IEvent | any>, arg2?: IEvent | any): void;
@@ -112,7 +124,7 @@ export interface IStorage extends IBaseStorageFuncs {
     type(type?: TStorageType): TStorageType | void;
     set(options: string | IStorageCommonSetOption | IStorageCommonSetOption[], value?: any): boolean;
     get(options: string | IAdapterStorageKeyArg | IAdapterStorageKeyArg[]): any;
-    all(options?: IStorageTypeArg & IStorageDetailArg): IJson<TGetReturn>;
+    all(options?: IStorageTypeArg & IStorageDetailArg): IKeyPathValuePair[];
     use(...plugins: IStoragePlugin[]): void;
     plugins(): IStoragePlugin[];
     EMPTY: Symbol;

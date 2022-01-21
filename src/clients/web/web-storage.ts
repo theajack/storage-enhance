@@ -2,33 +2,22 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:47:42
  * @LastEditors: tackchen
- * @LastEditTime: 2022-01-09 18:24:52
+ * @LastEditTime: 2022-01-21 09:02:31
  * @FilePath: /storage-enhance/src/clients/web/web-storage.ts
  * @Description: Coding something
  */
 
 import {globalType} from '../../convert/storage-type';
 import {TStorageType} from '../../type/constant';
-import {IStorageTypeArg} from '../../type/storage';
-import {IJson} from '../../type/util';
-import {IBaseStorage, TGetReturn} from '../../type/storage';
-import {addIntoAllData, buildPathStorageKey, formatStorageKeys, parseStorageValue} from '../../utils/util';
+import {IKeyPathPair, IKeyPathReturnPair, IStorageTypeArg} from '../../type/storage';
+import {IBaseStorage} from '../../type/storage';
+import {buildFinalKey, buildPathStorageKey, formatStorageKeys, parseStorageValue} from '../../utils/util';
 
-function getWebStorageKeys ({type, path}: IStorageTypeArg): {
-    originKeys: string[],
-    keys: string[],
-} {
+function getWebStorageKeys ({type, path}: IStorageTypeArg): IKeyPathPair[] {
     const keys = Object.keys(getStorageType(type));
-    if (!path) return {
-        originKeys: keys,
-        keys: formatStorageKeys(keys)
-    };
-    if (path[path.length - 1] !== '/') {path = (path + '/');}
+    if (!path) return formatStorageKeys(keys);
     const originKeys = keys.filter(key => (key.indexOf(path as string) === 0));
-    return {
-        originKeys,
-        keys: formatStorageKeys(originKeys)
-    };
+    return formatStorageKeys(originKeys);
 }
 
 export const WebStorage: IBaseStorage = {
@@ -40,7 +29,7 @@ export const WebStorage: IBaseStorage = {
         return Object.keys(storage).filter(key => key.indexOf(path) === 0).length;
     },
     keys ({type, path} = {}) {
-        return getWebStorageKeys({type, path}).keys;
+        return getWebStorageKeys({type, path});
     },
     get ({key, type, path}) {
         key = buildPathStorageKey({key, path});
@@ -72,7 +61,8 @@ export const WebStorage: IBaseStorage = {
             } else {
                 const keys = this.keys({path, type});
                 for (let i = 0, length = keys.length; i < length; i++) {
-                    this.remove({key: keys[i], type});
+                    const {key, path} = keys[i];
+                    this.remove({key, path, type});
                 }
             }
             return true;
@@ -81,15 +71,21 @@ export const WebStorage: IBaseStorage = {
         }
     },
     all ({type, path} = {}) {
-        const data: IJson<TGetReturn> = {};
-        const {originKeys, keys} = getWebStorageKeys({type, path});
+        const data: IKeyPathReturnPair[] = [];
+        const keys = getWebStorageKeys({type, path});
 
         const storage = getStorageType(type);
         for (let i = 0, length = keys.length; i < length; i++) {
-            const key = keys[i];
-            const value = storage.getItem(originKeys[i]);
+            const {key, path} = keys[i];
+            const finalKey = buildFinalKey({key, path});
+            const value = storage.getItem(finalKey);
             const storageData = parseStorageValue(value);
-            addIntoAllData({data, key, storageData});
+
+            data.push({
+                key,
+                path,
+                value: storageData
+            });
         }
         return data;
     },

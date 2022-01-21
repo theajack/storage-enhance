@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:04:14
  * @LastEditors: tackchen
- * @LastEditTime: 2022-01-09 18:00:44
+ * @LastEditTime: 2022-01-21 08:29:36
  * @FilePath: /storage-enhance/src/adapter.ts
  * @Description: Coding something
  */
@@ -15,7 +15,7 @@ import {StorageEnv} from './convert/storage-env';
 import {globalType, setGlobalType} from './convert/storage-type';
 import {TempStorege} from './temp/temp-storage';
 import {TStorageEnv, TStorageType} from './type/constant';
-import {IAdapterStorageKeyArg, IBaseStorage, IStorage, IStorageCommonSetOption, IStorageData, IStorageDetailArg, IStorageKeyArg, IStorageRemoveArg, TGetReturn} from './type/storage';
+import {IAdapterStorageKeyArg, IBaseStorage, IKeyPathValuePair, IStorage, IStorageCommonSetOption, IStorageData, IStorageDetailArg, IStorageKeyArg, IStorageRemoveArg, TGetReturn} from './type/storage';
 import {EMPTY} from './utils/constant';
 import {executePluginsGet, executePluginsRemove, executePluginsSet, getPlugins, usePlugin} from './plugin';
 import {TimesPlugin} from './plugins/times';
@@ -78,7 +78,7 @@ export const Storage: IStorage = {
         const keys = this.keys(options);
         const protects: IJson<IStorageData> = {};
         for (let i = 0, length = keys.length; i < length; i++) { // 执行remove插件
-            const key = keys[i];
+            const {key, path} = keys[i];
             const {result, prevData} = onRemoveData({
                 getOption: {key, type, path},
                 storage,
@@ -163,19 +163,17 @@ export const Storage: IStorage = {
     all ({type, path, detail} = {}) {
         const storage = getFinalBaseStorage(type);
         const data = storage.all({type, path});
-        for (const key in data) {
-            if (typeof data[key] === 'object') {
-                const storageData = (data[key] as IStorageData);
-
-                data[key] = onGetSingleData({
-                    options: {key, type, path},
-                    data: storageData,
-                    storage,
-                    detail,
-                });
-            }
-        }
-        return data;
+        const result: IKeyPathValuePair[] = data.map(item => {
+            const {key, path, value} = item;
+            const finalValue = (typeof value === 'object') ? onGetSingleData({
+                options: {key, type, path},
+                data: value,
+                storage,
+                detail,
+            }) : value;
+            return {key, path, value: finalValue};
+        });
+        return result;
     },
 };
 
@@ -185,7 +183,7 @@ function onGetSingleData ({ // 复用 get 方法触发事件的逻辑和转换fi
     options: IAdapterStorageKeyArg;
     data: TGetReturn;
     storage: IBaseStorage;
-} & IStorageDetailArg): TGetReturn {
+} & IStorageDetailArg): any {
     if (typeof data === 'string' || typeof data === 'symbol') return data;
 
     const {onFinalData, trigFinalData} = buildFinalCallback();

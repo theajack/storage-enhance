@@ -2,12 +2,12 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:04:32
  * @LastEditors: tackchen
- * @LastEditTime: 2022-01-09 18:42:59
+ * @LastEditTime: 2022-01-21 09:04:02
  * @FilePath: /storage-enhance/src/utils/util.ts
  * @Description: Coding something
  */
 
-import {IStorageData, IStorageKeyArg, TGetReturn} from 'src/type/storage';
+import {IKeyPathPair, IStorageData, IStorageKeyArg, TGetReturn} from 'src/type/storage';
 import {IJson} from '../type/util';
 import {EMPTY} from './constant';
 
@@ -47,12 +47,24 @@ export function buildPathStorageKey ({key, path}: IStorageKeyArg) {
     return `${path}/${encodeURIComponent(key)}`;
 }
 
-export function formatStorageKeys (keys: string[]) {
+export function formatStorageKeys (keys: string[]): IKeyPathPair[] {
     return keys.map(key => formatStorageKey(key));
 }
 
-export function formatStorageKey (key: string) {
-    return key.substring(key.lastIndexOf('/') + 1);
+export function formatStorageKey (key: string): IKeyPathPair {
+    const index = key.lastIndexOf('/');
+    let path = key.substring(0, index);
+    if (!path && index >= 0) path = '/';
+    return {
+        key: key.substring(index + 1),
+        path
+    };
+}
+
+export function buildFinalKey ({key, path}: IKeyPathPair): string {
+    if (path === '/') return `/${key}`;
+    if (path === '') return key;
+    return `${path}/${key}`;
 }
 
 export function countExpiresWithMs (ms: number): number {
@@ -64,25 +76,4 @@ export function parseStorageValue (value: symbol | string | null): TGetReturn {
     const data = parseJSON(value);
     if (data === null) return value;
     return data as IStorageData;
-}
-
-export function addIntoAllData ({
-    data,
-    key,
-    storageData,
-}: {
-    data: IJson<TGetReturn>;
-    key: string;
-    storageData: TGetReturn;
-}) {
-    if (typeof data[key] !== 'undefined' && typeof storageData === 'object') {
-        if (typeof storageData.path === 'undefined' || storageData.path === '/') {
-            debugger;
-            const pathKey = `${(data[key] as IStorageData).path}/${key}`;
-            data[pathKey] = data[key]; // ! 如果是跟目录且被占用了 则 将根目录交换出来
-        } else {
-            key = `${storageData.path}/${key}`;
-        }
-    }
-    data[key] = storageData;
 }

@@ -2,14 +2,13 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:47:42
  * @LastEditors: tackchen
- * @LastEditTime: 2022-01-09 18:29:07
+ * @LastEditTime: 2022-01-21 08:46:45
  * @FilePath: /storage-enhance/src/clients/miniapp/miniapp-storage.ts
  * @Description: Coding something
  */
 
-import {IJson} from '../../type/util';
-import {IBaseStorage, IStorageData} from '../../type/storage';
-import {addIntoAllData, buildPathStorageKey, formatStorageKeys} from '../../utils/util';
+import {IBaseStorage, IKeyPathReturnPair} from '../../type/storage';
+import {buildPathStorageKey, formatStorageKeys} from '../../utils/util';
 
 export const MiniAppStorage: IBaseStorage = {
     name: 'miniapp',
@@ -50,7 +49,8 @@ export const MiniAppStorage: IBaseStorage = {
             } else {
                 const keys = this.keys({path});
                 for (let i = 0, length = keys.length; i < length; i++) {
-                    this.remove({key: keys[i]});
+                    const {key, path} = keys[i];
+                    this.remove({key, path});
                 }
             }
             return true;
@@ -59,16 +59,21 @@ export const MiniAppStorage: IBaseStorage = {
         }
     },
     all ({path} = {}) {
-        const data: IJson<string | symbol | IStorageData> = {};
+        const data: IKeyPathReturnPair[] = [];
         const keys = this.keys({path});
         for (let i = 0, length = keys.length; i < length; i++) {
-            const key = keys[i];
+            const {key, path} = keys[i];
             const storageData = this.get({key, path});
-            addIntoAllData({data, key, storageData});
+            data.push({
+                key,
+                path,
+                value: storageData
+            });
         }
         return data;
     },
     exist ({key, path}) {
-        return this.keys({path}).indexOf(key) !== -1;
+        const keys = this.keys({path}).map(item => item.key);
+        return keys.indexOf(key) !== -1;
     }
 };

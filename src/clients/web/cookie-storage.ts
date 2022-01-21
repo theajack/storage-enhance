@@ -2,16 +2,15 @@
  * @Author: tackchen
  * @Date: 2021-12-22 09:21:03
  * @LastEditors: tackchen
- * @LastEditTime: 2022-01-09 18:27:56
+ * @LastEditTime: 2022-01-21 08:33:42
  * @FilePath: /storage-enhance/src/clients/web/cookie-storage.ts
  * @Description: Coding something
  */
 
-import {IJson} from '../../type/util';
 import {EMPTY} from '../../utils/constant';
 import {Cookie} from '../../utils/cookie';
 import {parseStorageValue} from '../../utils/util';
-import {IBaseStorage, TGetReturn} from '../../type/storage';
+import {IBaseStorage, IKeyPathReturnPair} from '../../type/storage';
 
 export const CookieStorage: IBaseStorage = {
     name: 'cookie',
@@ -22,7 +21,7 @@ export const CookieStorage: IBaseStorage = {
     keys ({path} = {}) {
         if (!Cookie.checkPath(path)) return [];
         return document.cookie.split(';').map(pair => {
-            return pair.split('=')[0].trim();
+            return {key: pair.split('=')[0].trim(), path: path || '/'};
         });
     },
     get ({key, path}) {
@@ -42,22 +41,28 @@ export const CookieStorage: IBaseStorage = {
         return Cookie.remove({key, path, domain});
     },
     clear ({path, domain} = {}) {
-        const keys = this.keys();
+        const keys = this.keys({path});
         for (let i = 0, length = keys.length; i < length; i++) {
-            this.remove({key: keys[i], path, domain});
+            const {key, path} = keys[i];
+            this.remove({key, path, domain});
         }
         return true;
     },
     all ({path} = {}) {
-        const data: IJson<TGetReturn> = {};
+        const data: IKeyPathReturnPair[] = [];
         if (!Cookie.checkPath(path)) return data;
         document.cookie.split(';').forEach(pair => {
             const pairArr = pair.split('=');
-            data[pairArr[0].trim()] = parseStorageValue(pairArr[1]);
+            data.push({
+                key: pairArr[0].trim(),
+                path: path || '/',
+                value: parseStorageValue(pairArr[1])
+            });
         });
         return data;
     },
     exist ({key}) {
-        return this.keys().indexOf(key) !== -1;
+        const keys = this.keys().map(item => item.key);
+        return keys.indexOf(key) !== -1;
     }
 };

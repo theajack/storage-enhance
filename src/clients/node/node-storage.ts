@@ -6,11 +6,10 @@
  * @Description: Coding something
  */
 import {StorageEnv} from '../../convert/storage-env';
-import {IBaseStorage, IStorageKeyArg, TGetReturn} from '../../type/storage';
+import {IBaseStorage, IKeyPathPair, IKeyPathReturnPair, IStorageKeyArg} from '../../type/storage';
 import {IFS, IPath} from '../../type/node';
 import {EMPTY} from '../../utils/constant';
-import {addIntoAllData, parseStorageValue} from '../../utils/util';
-import {IJson} from 'src/type/util';
+import {buildFinalKey, parseStorageValue} from '../../utils/util';
 
 let fs: IFS = {} as IFS;
 let path: IPath = {} as IPath;
@@ -66,13 +65,17 @@ export const NodeStorege: IBaseStorage = {
     },
     all ({path} = {}) {
         const keys = this.keys({path});
-        const data: IJson<TGetReturn> = {};
+        const data: IKeyPathReturnPair[] = [];
         for (let i = 0, length = keys.length; i < length; i++) {
-            const key = keys[i];
+            const {key, path} = keys[i];
             const storageData = parseStorageValue(
                 readFileBase({key, check: false, filePath: resolvePath(key, path)})
             );
-            addIntoAllData({data, key, storageData});
+            data.push({
+                key,
+                path,
+                value: storageData
+            });
         }
         return data;
     },
@@ -107,15 +110,22 @@ function readFileBase ({
     return EMPTY;
 }
 
-function findKeysBase (base: string, filePath: string, keys: string[]) {
+function findKeysBase (base: string, filePath: string, keys: IKeyPathPair[]): IKeyPathPair[] {
     const fileList = fs.readdirSync(filePath);
     for (let i = 0, length = fileList.length; i < length; i++) {
         const fileName = fileList[i];
         const index = fileName.lastIndexOf('.json');
         if (index !== -1) { // 可以用.json 来判断是否是文件 是因为path中的点都没替换成空了
-            keys.push(`${base}/${fileName.substring(0, index)}`);
+            keys.push({
+                key: fileName.substring(0, index),
+                path: base
+            });
         } else {
-            findKeysBase(`${base}/${fileName}`, path.resolve(filePath, fileName), keys);
+            findKeysBase(
+                buildFinalKey({key: fileName, path: base}),
+                path.resolve(filePath, fileName),
+                keys
+            );
         }
     }
     return keys;
