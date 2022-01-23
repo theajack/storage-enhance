@@ -24,8 +24,7 @@ caseFiles.forEach(name => {
         cases.push(item);
     }
 });
-
-start({
-    storage,
-    cases,
+// 'local', 'session', 'temp',
+['local'].forEach(type => {
+    start({storage, cases, type});
 });

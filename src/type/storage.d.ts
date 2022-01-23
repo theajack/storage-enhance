@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:30:47
  * @LastEditors: tackchen
- * @LastEditTime: 2022-01-21 08:27:47
+ * @LastEditTime: 2022-01-22 15:31:26
  * @FilePath: /storage-enhance/src/type/storage.d.ts
  * @Description: Coding something
  */
@@ -16,13 +16,14 @@ export type TStorageKey = string;
 export interface IStorageTypeArg {
     type?: TStorageType;
     path?: string;
+    pathStrict?: boolean; // 其他模式是否参照cookie使用严格隔离path默认 只能写 不可读 默认为false
 }
 
 export interface IStorageDetailArg {
     detail?: boolean;
 }
 
-export interface IStorageClearArg extends IStorageTypeArg, ICookieDomain {
+export interface IStorageClearArg extends IStorageTypeArg, ICookieDomain, IStorageProtectType {
 }
 
 export interface IStorageKeyArg extends IStorageTypeArg {
@@ -32,7 +33,7 @@ export interface IStorageKeyArg extends IStorageTypeArg {
 export interface IAdapterStorageKeyArg extends IStorageKeyArg, IStorageDetailArg {
 }
 
-export interface IStorageRemoveArg extends IStorageKeyArg, ICookieDomain {
+export interface IStorageRemoveArg extends IStorageKeyArg, ICookieDomain, IStorageProtectType {
 }
 
 export interface IBaseStorageSetValueArg extends IStorageKeyArg {
@@ -64,7 +65,10 @@ export type TStorageDataType = 'string' | 'bigint' | 'number' | 'boolean' | 'sym
     'undefined' | 'object' | 'function' |
     'html' | 'date' | 'null' | 'reg';
 
-export interface IStorageBaseOption {
+export interface IStorageProtectType {
+    protect?: boolean; // 不可以被删除的
+}
+export interface IStorageBaseOption extends IStorageProtectType {
     value: string | any;
     expires?: number; // 过期时间 datetime
     once?: boolean; // 是否是一次性的
@@ -73,8 +77,8 @@ export interface IStorageBaseOption {
     // encrypt?: boolean; // 是否为加密存储
     path?: string;
     final?: boolean; // 是否是不可改变的
-    protect?: boolean; // 不可以被删除的
 }
+
 
 export interface IStorageData extends IStorageBaseOption {
     type: TStorageDataType;

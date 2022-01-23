@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-12 16:25:06
  * @LastEditors: tackchen
- * @LastEditTime: 2022-01-21 08:51:21
+ * @LastEditTime: 2022-01-22 21:32:11
  * @FilePath: /storage-enhance/src/temp/temp-storage.ts
  * @Description: Coding something
  */
@@ -20,7 +20,7 @@ const PathSymbol = Symbol('path');
 // /aa/bb/key => storageMap.aa.bb.key
 let storageMap: IJson = {};
 
-window.tempMap = storageMap;
+window.getTempMap = () => storageMap;
 
 function oprateStorageMap (path: string = '', type: TTempMapOprateType = 'get'): IJson | boolean {
     if (!path || path === '/') {
@@ -122,7 +122,7 @@ export const TempStorege: IBaseStorage = {
         return map.hasOwnProperty(key) && !isPathMap((map as IJson)[key]);
     },
     get ({key, path}) {
-        return this.exist({key}) ? deepClone((oprateStorageMap(path) as IJson)[key]) : EMPTY;
+        return this.exist({key, path}) ? deepClone((oprateStorageMap(path) as IJson)[key]) : EMPTY;
     },
     set ({key, value, path}) {
         (oprateStorageMap(path, 'set') as IJson)[key] = deepClone(value);

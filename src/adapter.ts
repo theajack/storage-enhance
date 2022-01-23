@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:04:14
  * @LastEditors: tackchen
- * @LastEditTime: 2022-01-21 08:29:36
+ * @LastEditTime: 2022-01-22 22:44:56
  * @FilePath: /storage-enhance/src/adapter.ts
  * @Description: Coding something
  */
@@ -15,7 +15,7 @@ import {StorageEnv} from './convert/storage-env';
 import {globalType, setGlobalType} from './convert/storage-type';
 import {TempStorege} from './temp/temp-storage';
 import {TStorageEnv, TStorageType} from './type/constant';
-import {IAdapterStorageKeyArg, IBaseStorage, IKeyPathValuePair, IStorage, IStorageCommonSetOption, IStorageData, IStorageDetailArg, IStorageKeyArg, IStorageRemoveArg, TGetReturn} from './type/storage';
+import {IAdapterStorageKeyArg, IBaseStorage, IKeyPathPair, IKeyPathReturnPair, IKeyPathValuePair, IStorage, IStorageCommonSetOption, IStorageData, IStorageDetailArg, IStorageKeyArg, IStorageRemoveArg, TGetReturn} from './type/storage';
 import {EMPTY} from './utils/constant';
 import {executePluginsGet, executePluginsRemove, executePluginsSet, getPlugins, usePlugin} from './plugin';
 import {TimesPlugin} from './plugins/times';
@@ -26,6 +26,7 @@ import {getScope, registScope} from './utils/scope';
 import {FinalPlugin} from './plugins/final';
 import {ProtectPlugin} from './plugins/protect';
 import {IJson} from './type/util';
+import {checkPathStrictOptions, filterItemsOfPathStrict} from './utils/path-strict';
 
 const StorageMap: {
     [prod in TStorageEnv]: IBaseStorage
@@ -72,7 +73,7 @@ export const Storage: IStorage = {
     },
     length: ({type, path} = {}) => getFinalBaseStorage(type).length({type, path}),
     clear (options = {}) {
-        const {type, path, domain} = options;
+        const {type, path, domain, protect} = options;
         const storage = getFinalBaseStorage(type);
 
         const keys = this.keys(options);
@@ -82,7 +83,7 @@ export const Storage: IStorage = {
             const {result, prevData} = onRemoveData({
                 getOption: {key, type, path},
                 storage,
-                removeOption: {key, domain}
+                removeOption: {key, domain, protect}
             });
             if (result === false && typeof prevData === 'object') {
                 protects[key] = prevData;
@@ -92,12 +93,20 @@ export const Storage: IStorage = {
         const clearResult = storage.clear({type, path, domain});
 
         for (const key in protects) { // 对remove失败的重新写入
-            this.set({key, value: protects[key].value, type, path});
+            const {value, protect} = protects[key];
+            this.set({key, value, protect, type, path});
         }
 
         return clearResult;
     },
-    keys: ({type, path} = {}) => getFinalBaseStorage(type).keys({type, path}),
+    keys: ({type, path, pathStrict} = {}) => {
+        if (!checkPathStrictOptions({type, path, pathStrict})) return [];
+        return filterItemsOfPathStrict<IKeyPathPair>({
+            type,
+            data: getFinalBaseStorage(type).keys({type, path}),
+            pathStrict,
+        });
+    },
     remove: (options) => {
         const {key, type, path, domain} = options;
         if (key === '') {return true;}
@@ -112,7 +121,8 @@ export const Storage: IStorage = {
         
         return storage.remove({key, type, path, domain});
     },
-    exist: ({key, type, path}) => {
+    exist: ({key, type, path, pathStrict}) => {
+        if (!checkPathStrictOptions({type, path, pathStrict})) return false;
         if (key === '') {return false;}
         return getFinalBaseStorage(type).exist({key, type, path});
     },
@@ -142,7 +152,6 @@ export const Storage: IStorage = {
 
         return storage.set(options);
     },
-    
     get (arg) {
         if (arg instanceof Array) {
             const result: any[] = [];
@@ -152,6 +161,7 @@ export const Storage: IStorage = {
             return result;
         }
         const options: IAdapterStorageKeyArg = (typeof arg === 'object') ? arg : {key: arg};
+        if (!checkPathStrictOptions(options)) return Storage.EMPTY;
         const {key, type, path, detail} = options;
         if (key === '') {return EMPTY;}
         const storage = getFinalBaseStorage(type);
@@ -160,9 +170,14 @@ export const Storage: IStorage = {
 
         return onGetSingleData({options, data, storage, detail});
     },
-    all ({type, path, detail} = {}) {
+    all ({type, path, detail, pathStrict} = {}) {
+        if (!checkPathStrictOptions({type, path, pathStrict})) [];
         const storage = getFinalBaseStorage(type);
-        const data = storage.all({type, path});
+        const data = filterItemsOfPathStrict<IKeyPathReturnPair>({
+            type,
+            data: storage.all({type, path}),
+            pathStrict,
+        });
         const result: IKeyPathValuePair[] = data.map(item => {
             const {key, path, value} = item;
             const finalValue = (typeof value === 'object') ? onGetSingleData({

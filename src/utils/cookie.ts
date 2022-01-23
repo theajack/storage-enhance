@@ -10,6 +10,11 @@
  * httpOnly js没办法设置
  */
 
+/*
+    能设置和删除所有 path的cookie
+    只能获取当前及上级path的cookie
+*/
+
 import {ICookieGetOptions, ICookieRemoveOptions, ICookieSetOptions} from '../type/cookie';
 import {EMPTY} from './constant';
 import {countExpiresWithMs} from './util';
@@ -63,16 +68,23 @@ function removeCookie (options: ICookieRemoveOptions) {
     return setCookie(setOptions);
 }
 
-function checkPath (path: string = '') {
-    if (!path) return true;
+function checkPath (path: string = '/') {
+    const result = path === location.pathname;
+    if (!result)
+        console.warn(`Cookie 操作无效: path与当前pathname不一致; ${path} - ${location.pathname}`);
+    return result;
+}
 
-    console.warn(`Cookie 操作无效: path与当前pathname不一致; ${path} - ${location.pathname}`);
-    return path === location.pathname;
+function getCookieValuePairs (): string[] {
+    const cookie = document.cookie;
+    if (cookie === '') return [];
+    return cookie.split(';');
 }
 
 export const Cookie = {
     get: getCookie,
     set: setCookie,
     remove: removeCookie,
-    checkPath
+    checkPath,
+    getCookieValuePairs
 };

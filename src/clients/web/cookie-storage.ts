@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-22 09:21:03
  * @LastEditors: tackchen
- * @LastEditTime: 2022-01-21 08:33:42
+ * @LastEditTime: 2022-01-22 22:02:15
  * @FilePath: /storage-enhance/src/clients/web/cookie-storage.ts
  * @Description: Coding something
  */
@@ -16,11 +16,11 @@ export const CookieStorage: IBaseStorage = {
     name: 'cookie',
     length ({path} = {}) {
         if (!Cookie.checkPath(path)) return 0;
-        return document.cookie.split(';').length;
+        return Cookie.getCookieValuePairs().length;
     },
     keys ({path} = {}) {
         if (!Cookie.checkPath(path)) return [];
-        return document.cookie.split(';').map(pair => {
+        return Cookie.getCookieValuePairs().map(pair => {
             return {key: pair.split('=')[0].trim(), path: path || '/'};
         });
     },
@@ -51,12 +51,12 @@ export const CookieStorage: IBaseStorage = {
     all ({path} = {}) {
         const data: IKeyPathReturnPair[] = [];
         if (!Cookie.checkPath(path)) return data;
-        document.cookie.split(';').forEach(pair => {
+        Cookie.getCookieValuePairs().forEach(pair => {
             const pairArr = pair.split('=');
             data.push({
                 key: pairArr[0].trim(),
                 path: path || '/',
-                value: parseStorageValue(pairArr[1])
+                value: parseStorageValue(decodeURIComponent(pairArr[1]))
             });
         });
         return data;

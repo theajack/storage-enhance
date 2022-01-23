@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-30 09:10:48
  * @LastEditors: tackchen
- * @LastEditTime: 2022-01-08 23:19:11
+ * @LastEditTime: 2022-01-22 15:33:04
  * @FilePath: /storage-enhance/src/plugins/protect.ts
  * @Description: Coding something
  */
@@ -18,8 +18,8 @@ export const ProtectPlugin: IStoragePlugin = {
         return data;
     },
 
-    remove ({prevData}) {
-        if (typeof prevData === 'object') {
+    remove ({prevData, options}) {
+        if (typeof prevData === 'object' && !options.protect) {
             return prevData.protect !== true;
         }
         return true;
