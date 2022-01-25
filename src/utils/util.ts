@@ -2,12 +2,12 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:04:32
  * @LastEditors: tackchen
- * @LastEditTime: 2022-01-21 09:04:02
+ * @LastEditTime: 2022-01-24 09:13:31
  * @FilePath: /storage-enhance/src/utils/util.ts
  * @Description: Coding something
  */
 
-import {IKeyPathPair, IStorageData, IStorageKeyArg, TGetReturn} from 'src/type/storage';
+import {IStorageData, TGetReturn, TStorageOriginData} from 'src/type/storage';
 import {IJson} from '../type/util';
 import {EMPTY} from './constant';
 
@@ -42,38 +42,17 @@ export function parseJSON (value: string) : object | null {
     }
 }
 
-export function buildPathStorageKey ({key, path}: IStorageKeyArg) {
-    if (!path || path === '/') {path = '';}
-    return `${path}/${encodeURIComponent(key)}`;
-}
-
-export function formatStorageKeys (keys: string[]): IKeyPathPair[] {
-    return keys.map(key => formatStorageKey(key));
-}
-
-export function formatStorageKey (key: string): IKeyPathPair {
-    const index = key.lastIndexOf('/');
-    let path = key.substring(0, index);
-    if (!path && index >= 0) path = '/';
-    return {
-        key: key.substring(index + 1),
-        path
-    };
-}
-
-export function buildFinalKey ({key, path}: IKeyPathPair): string {
-    if (path === '/') return `/${key}`;
-    if (path === '') return key;
-    return `${path}/${key}`;
-}
-
 export function countExpiresWithMs (ms: number): number {
     return Date.now() + ms;
 }
 
-export function parseStorageValue (value: symbol | string | null): TGetReturn {
+export function parseStorageValue (value: TStorageOriginData): TGetReturn {
     if (value === null || typeof value === 'symbol') return EMPTY;
     const data = parseJSON(value);
     if (data === null) return value;
     return data as IStorageData;
+}
+
+export function isValidStorageData (data: TGetReturn) {
+    return typeof data === 'object';
 }

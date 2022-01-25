@@ -24,7 +24,6 @@ export const TimesPlugin: IStoragePlugin = {
                 key: options.key,
                 value: data,
                 type: options.type,
-                path: options.path,
             });
         }
         return data;

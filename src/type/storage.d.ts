@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:30:47
  * @LastEditors: tackchen
- * @LastEditTime: 2022-01-22 15:31:26
+ * @LastEditTime: 2022-01-25 08:41:26
  * @FilePath: /storage-enhance/src/type/storage.d.ts
  * @Description: Coding something
  */
@@ -15,8 +15,17 @@ export type TStorageKey = string;
 
 export interface IStorageTypeArg {
     type?: TStorageType;
+}
+
+export interface IStoragePathArg {
     path?: string;
-    pathStrict?: boolean; // 其他模式是否参照cookie使用严格隔离path默认 只能写 不可读 默认为false
+}
+
+export interface IStoragePathEnableArg {
+    enablePath?: boolean;
+}
+
+export interface IStorageTypePathArg extends IStorageTypeArg, IStoragePathArg {
 }
 
 export interface IStorageDetailArg {
@@ -30,7 +39,10 @@ export interface IStorageKeyArg extends IStorageTypeArg {
     key: TStorageKey;
 }
 
-export interface IAdapterStorageKeyArg extends IStorageKeyArg, IStorageDetailArg {
+export interface IAdapterStorageKeyArg extends
+    IStorageKeyArg,
+    IStorageDetailArg,
+    IStoragePathEnableArg {
 }
 
 export interface IStorageRemoveArg extends IStorageKeyArg, ICookieDomain, IStorageProtectType {
@@ -45,12 +57,15 @@ export interface IKeyPathPair {
     key: TStorageKey;
     path: string;
 }
+export interface IKeyOriginValuePair {
+    key: TStorageKey;
+    value: TStorageOriginData;
+}
 
 export interface IBaseStorageFuncs {
     length(options?: IStorageTypeArg): number;
-    keys(options?: IStorageTypeArg): IKeyPathPair[];
     clear(options?: IStorageClearArg): boolean;
-    get(options: IStorageKeyArg): TGetReturn;
+    get(options: IStorageKeyArg): TStorageOriginData;
     remove(options: IStorageRemoveArg): boolean;
     exist(options: IStorageKeyArg): boolean;
     set(options: IBaseStorageSetValueArg): boolean;
@@ -58,7 +73,32 @@ export interface IBaseStorageFuncs {
 
 export interface IBaseStorage extends IBaseStorageFuncs {
     name: TStorageName;
-    all(options?: IStorageTypeArg): IKeyPathReturnPair[];
+    keys(options?: IStorageTypeArg): string[];
+    all(options?: IStorageTypeArg): IKeyOriginValuePair[];
+}
+export interface IStorage extends IBaseStorageFuncs {
+    env: TStorageEnv;
+    length(options?: IStorageTypeArg & IStoragePathEnableArg): number;
+    keys(options?: IStorageTypeArg & IStoragePathEnableArg): IKeyPathPair[];
+    clear(options?: IStorageClearArg & IStoragePathEnableArg): boolean;
+    exist(options: IStorageKeyArg & IStoragePathEnableArg): boolean;
+    remove(options: IStorageRemoveArg & IStoragePathEnableArg): boolean;
+
+    set(options: IStorageCommonSetOption & IStoragePathEnableArg): boolean;
+    setWithString(key: string, value: any): boolean;
+    setWithArray(array: (IStorageCommonSetOption & IStoragePathEnableArg)[]): boolean;
+    
+    get(options: IAdapterStorageKeyArg): IKeyPathValuePair;
+    getWithString(key: string): IKeyPathValuePair;
+    getWithArray(array: IAdapterStorageKeyArg[]): IKeyPathValuePair[];
+
+    all(options?: IStorageTypeArg & IStorageDetailArg & IStoragePathEnableArg): IKeyPathValuePair[];
+    use(...plugins: IStoragePlugin[]): void;
+    plugins(): IStoragePlugin[];
+    registScope(arg1: string | IJson<IEvent | any>, arg2?: IEvent | any): void;
+    scope(): void;
+    type(type?: TStorageType): TStorageType | void;
+    EMPTY: Symbol;
 }
 
 export type TStorageDataType = 'string' | 'bigint' | 'number' | 'boolean' | 'symbol' |
@@ -88,11 +128,10 @@ export interface IStorageData extends IStorageBaseOption {
     onRemove?: string;
 }
 
+export type TStorageOriginData = any;
+
 export type TGetReturn = IStorageData | string | symbol;
 
-export interface IKeyPathReturnPair extends IKeyPathPair {
-    value: TGetReturn;
-}
 
 export interface IEventOption {
     scope: IJson<any>;
@@ -120,18 +159,6 @@ export type TOprate = 'get' | 'set';
 
 export interface IKeyPathValuePair extends IKeyPathPair {
     value: any;
-}
-export interface IStorage extends IBaseStorageFuncs {
-    env: TStorageEnv;
-    registScope(arg1: string | IJson<IEvent | any>, arg2?: IEvent | any): void;
-    scope(): void;
-    type(type?: TStorageType): TStorageType | void;
-    set(options: string | IStorageCommonSetOption | IStorageCommonSetOption[], value?: any): boolean;
-    get(options: string | IAdapterStorageKeyArg | IAdapterStorageKeyArg[]): any;
-    all(options?: IStorageTypeArg & IStorageDetailArg): IKeyPathValuePair[];
-    use(...plugins: IStoragePlugin[]): void;
-    plugins(): IStoragePlugin[];
-    EMPTY: Symbol;
 }
 
 export type TTempMapOprateType = TOprate | 'clear';

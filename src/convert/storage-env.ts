@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-14 08:34:32
  * @LastEditors: tackchen
- * @LastEditTime: 2021-12-16 01:48:59
+ * @LastEditTime: 2022-01-23 23:14:31
  * @FilePath: /storage-enhance/src/convert/storage-env.ts
  * @Description: Coding something
  */
@@ -20,3 +20,5 @@ if (StorageEnv === 'web') {
         window.require = (() => {})as any;
     }
 }
+
+export const IsWeb = StorageEnv === 'web';
