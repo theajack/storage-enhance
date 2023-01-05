@@ -1,31 +1,27 @@
 /*
  * @Author: tackchen
  * @Date: 2021-12-22 09:21:03
- * @LastEditors: tackchen
- * @LastEditTime: 2022-01-22 22:02:15
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2023-01-05 09:08:44
  * @FilePath: /storage-enhance/src/clients/web/cookie-storage.ts
  * @Description: Coding something
  */
 
-import {EMPTY} from '../../utils/constant';
 import {Cookie} from '../../utils/cookie';
 import {parseStorageValue} from '../../utils/util';
-import {IBaseStorage, IKeyPathReturnPair} from '../../type/storage';
+import {IBaseStorage, IKeyValuePair} from '../../type/storage';
 
 export const CookieStorage: IBaseStorage = {
     name: 'cookie',
-    length ({path} = {}) {
-        if (!Cookie.checkPath(path)) return 0;
+    length () {
         return Cookie.getCookieValuePairs().length;
     },
-    keys ({path} = {}) {
-        if (!Cookie.checkPath(path)) return [];
+    keys () {
         return Cookie.getCookieValuePairs().map(pair => {
-            return {key: pair.split('=')[0].trim(), path: path || '/'};
+            return pair.split('=')[0].trim();
         });
     },
-    get ({key, path}) {
-        if (!Cookie.checkPath(path)) return EMPTY; // ! cookie获取不到其他path的数据
+    get ({key}) {
         const value = Cookie.get({key});
         return parseStorageValue(value);
     },
@@ -37,32 +33,30 @@ export const CookieStorage: IBaseStorage = {
             return false;
         }
     },
-    remove ({key, path, domain}) {
-        return Cookie.remove({key, path, domain});
+    remove ({key, domain}) {
+        return Cookie.remove({key, domain});
     },
-    clear ({path, domain} = {}) {
-        const keys = this.keys({path});
+    clear ({domain} = {}) {
+        const keys = this.keys();
         for (let i = 0, length = keys.length; i < length; i++) {
             const {key, path} = keys[i];
             this.remove({key, path, domain});
         }
         return true;
     },
-    all ({path} = {}) {
-        const data: IKeyPathReturnPair[] = [];
-        if (!Cookie.checkPath(path)) return data;
+    all () {
+        const data: IKeyValuePair[] = [];
         Cookie.getCookieValuePairs().forEach(pair => {
             const pairArr = pair.split('=');
             data.push({
                 key: pairArr[0].trim(),
-                path: path || '/',
                 value: parseStorageValue(decodeURIComponent(pairArr[1]))
             });
         });
         return data;
     },
     exist ({key}) {
-        const keys = this.keys().map(item => item.key);
+        const keys = this.keys();
         return keys.indexOf(key) !== -1;
     }
 };

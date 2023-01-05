@@ -8,22 +8,22 @@
 
 import {EMPTY} from '../utils/constant';
 import {IStoragePlugin} from '../type/plugin';
+import {Storage} from '../adapter';
 
 export const TimesPlugin: IStoragePlugin = {
     name: 'times',
-    get ({options, data, storage}) {
+    get ({options, data, storage, storageKey}) {
         if (typeof data.times !== 'number') return data;
         if (data.times <= 1) {
-            storage.remove(options);
+            Storage.remove(options);
             if (data.times < 1) {
                 return EMPTY;
             }
         } else {
             data.times -= 1;
             storage.set({
-                key: options.key,
-                value: data,
-                type: options.type,
+                key: storageKey,
+                value: data
             });
         }
         return data;

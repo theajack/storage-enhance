@@ -16,6 +16,7 @@ interface IPluginGetOptions {
     options: IStorageKeyArg;
     data: IStorageData;
     storage: IBaseStorage;
+    storageKey: string;
     onFinalData(
         callback: (data: any)=>void
     ): void;

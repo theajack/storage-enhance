@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2022-01-02 08:00:18
  * @LastEditors: tackchen
- * @LastEditTime: 2022-01-08 12:23:17
+ * @LastEditTime: 2022-01-29 10:33:36
  * @FilePath: /storage-enhance/test/cases/remove.js
  * @Description: Coding something
  */
@@ -13,7 +13,7 @@ module.exports = [{
         const value = this.expect;
         storage.set({key, value, protect: false});
         storage.remove({key});
-        return storage.get({key});
+        return storage.get({key}).value;
     },
     expect ({storage}) {
         return storage.EMPTY;

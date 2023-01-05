@@ -5,7 +5,7 @@ function buildGetSetCommonCase (name, expect, {resultHandle, expectHandle} = {})
         test ({storage}) {
             const key = 'set-get-key';
             storage.set({key, value: expect});
-            const result = storage.get({key});
+            const result = storage.get({key}).value;
             if (resultHandle) {
                 return resultHandle(result);
             }

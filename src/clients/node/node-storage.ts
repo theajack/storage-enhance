@@ -1,15 +1,15 @@
 /*
  * @Author: tackchen
  * @Date: 2021-12-15 14:57:03
- * @LastEditors: tackchen
+ * @LastEditors: Please set LastEditors
  * @FilePath: /storage-enhance/src/clients/node/node-storage.ts
  * @Description: Coding something
  */
 import {StorageEnv} from '../../convert/storage-env';
-import {IBaseStorage, IKeyPathPair, IKeyPathReturnPair, IStorageKeyArg} from '../../type/storage';
+import {IBaseStorage, IKeyValuePair, IStorageKeyArg} from '../../type/storage';
 import {IFS, IPath} from '../../type/node';
 import {EMPTY} from '../../utils/constant';
-import {buildFinalKey, parseStorageValue} from '../../utils/util';
+import {parseStorageValue} from '../../utils/util';
 
 let fs: IFS = {} as IFS;
 let path: IPath = {} as IPath;
@@ -30,19 +30,19 @@ if (StorageEnv === 'node') {
 
 export const NodeStorege: IBaseStorage = {
     name: 'node',
-    length ({path} = {}) {
-        return this.keys({path}).length;
+    length () {
+        return this.keys().length;
     },
-    keys ({path} = {}) {
-        const filePath = buildFilePath({key: '', path});
+    keys () {
+        const filePath = buildFilePath({key: ''});
         return findKeysBase('', filePath, []);
     },
-    exist ({key, path}) {
-        const filePath = buildFilePath({key, path});
+    exist ({key}) {
+        const filePath = buildFilePath({key});
         return fs.existsSync(filePath);
     },
-    get ({key, path}) {
-        const value = readFileBase({key, path});
+    get ({key}) {
+        const value = readFileBase({key});
         return parseStorageValue(value);
     },
     set ({key, value, path}) {
@@ -65,7 +65,7 @@ export const NodeStorege: IBaseStorage = {
     },
     all ({path} = {}) {
         const keys = this.keys({path});
-        const data: IKeyPathReturnPair[] = [];
+        const data: IKeyValuePair[] = [];
         for (let i = 0, length = keys.length; i < length; i++) {
             const {key, path} = keys[i];
             const storageData = parseStorageValue(
@@ -73,7 +73,6 @@ export const NodeStorege: IBaseStorage = {
             );
             data.push({
                 key,
-                path,
                 value: storageData
             });
         }
@@ -110,19 +109,16 @@ function readFileBase ({
     return EMPTY;
 }
 
-function findKeysBase (base: string, filePath: string, keys: IKeyPathPair[]): IKeyPathPair[] {
+function findKeysBase (base: string, filePath: string, keys: string[]): string[] {
     const fileList = fs.readdirSync(filePath);
     for (let i = 0, length = fileList.length; i < length; i++) {
         const fileName = fileList[i];
         const index = fileName.lastIndexOf('.json');
         if (index !== -1) { // 可以用.json 来判断是否是文件 是因为path中的点都没替换成空了
-            keys.push({
-                key: fileName.substring(0, index),
-                path: base
-            });
+            keys.push(fileName.substring(0, index));
         } else {
             findKeysBase(
-                buildFinalKey({key: fileName, path: base}),
+                fileName,
                 path.resolve(filePath, fileName),
                 keys
             );

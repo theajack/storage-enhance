@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2022-01-22 22:24:44
  * @LastEditors: tackchen
- * @LastEditTime: 2022-01-25 09:17:20
+ * @LastEditTime: 2022-01-29 12:57:17
  * @FilePath: /storage-enhance/src/utils/path-util.ts
  * @Description: Coding something
  */
@@ -33,23 +33,35 @@ export const buildPathName = (enablePath?: boolean) => enablePath ? PathName : R
 export const buildFinalKeyMap = ({
     key,
     path,
-    enablePath
+    isSet = false
 }: {
     key: string;
     path?: string;
-    enablePath?: boolean;
+    isSet?: boolean;
 }) => {
-    if (typeof path === 'undefined') {
-        path = buildPathName(enablePath);
-    }
+    path = buildStoragePath({path, isSet});
     return {
         key,
-        path,
-        storageKey: buildPathStorageKey({key, path})
+        storagePath: path,
+        storageKey: buildStorageKey({key, path})
     };
 };
 
-export function buildPathStorageKey ({key, path}: IKeyPathPair): string {
+export function buildStoragePath ({
+    path,
+    isSet = false
+}: {
+    path?: string;
+    isSet?: boolean;
+}) {
+    return path || (isSet ? RootPathName : PathName);
+    // 如果是设置的话 接受传入的path 默认使用根目录
+    // ! 如果是获取的话 cookie情况下 无需传入path 传入 / 即可
+    // 否则使用传入的path 默认使用当前页面路径
+}
+
+// 根据key path拼接最终的storageKey
+export function buildStorageKey ({key, path}: IKeyPathPair): string {
     if (path === '') path = '/';
     else if (path[path.length - 1] !== '/') path += '/';
     return `${path}${key}`;
