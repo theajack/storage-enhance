@@ -17,7 +17,7 @@
 
 <h3>🚀 Multi-terminal support, powerful Storage</h3>
 
-**[English](https://github.com/theajack/storage-enhance/blob/master/README.md) | [Changelog](https://github.com/theajack/storage-enhance/blob/master/helper/version.md) | [Feedback Errors/Missing Points](https://github.com/theajack/storage-enhance/issues/new) | [Gitee](https://gitee.com/theajack/storage-enhance)**
+**[中文](https://github.com/theajack/storage-enhance/blob/master/README.cn.md) | [Changelog](https://github.com/theajack/storage-enhance/blob/master/helper/version.md) | [Feedback Errors/Missing Points](https://github.com/theajack/storage-enhance/issues/new) | [Gitee](https://gitee.com/theajack/storage-enhance)**
 
 ---
 
