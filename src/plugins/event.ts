@@ -1,7 +1,7 @@
 /*
  * @Author: tackchen
  * @Date: 2021-12-17 18:50:16
- * @LastEditors: tackchen
+ * @LastEditors: Please set LastEditors
  * @FilePath: /storage-enhance/src/plugins/event.ts
  * @Description: Coding something
  */
@@ -23,7 +23,7 @@ function stringifyEvent (evt: string | Function): string {
     });
 }
 
-export function parseEvnet (eventStr: string): IEvent | null {
+export function parseEvent (eventStr: string): IEvent | null {
     if (eventStr.indexOf('@:') === 0) {
         const eventName = eventStr.substring(2);
         const scope = getScope();
@@ -68,7 +68,7 @@ export const EventPlugin: IStoragePlugin = {
 
 function trigEvent (eventStr: string | undefined, data: any, prevData?: any) {
     if (typeof eventStr === 'undefined') return;
-    const event = parseEvnet(eventStr);
+    const event = parseEvent(eventStr);
     if (event === null) {
         console.warn('Invalid event:', eventStr);
         return;

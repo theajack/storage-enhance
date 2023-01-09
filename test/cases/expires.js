@@ -16,7 +16,7 @@ module.exports = [{
         storage.set({key, value, expires: Date.now() + 300});
         return new Promise(resolve => {
             delay(400).then(() => {
-                resolve(storage.get({key}).value);
+                resolve(storage.get({key}));
             });
         });
     },

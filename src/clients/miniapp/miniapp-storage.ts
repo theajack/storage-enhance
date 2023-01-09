@@ -2,17 +2,16 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:47:42
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2023-01-05 09:09:28
+ * @LastEditTime: 2023-01-07 18:31:47
  * @FilePath: /storage-enhance/src/clients/miniapp/miniapp-storage.ts
  * @Description: Coding something
  */
 
 import {IBaseStorage, IKeyValuePair} from '../../type/storage';
-import '../../type/wx';
 
 export const MiniAppStorage: IBaseStorage = {
     name: 'miniapp',
-    length () {
+    count () {
         return this.keys().length;
     },
     keys () {
@@ -49,8 +48,8 @@ export const MiniAppStorage: IBaseStorage = {
         const data: IKeyValuePair[] = [];
         const keys = this.keys();
         for (let i = 0, length = keys.length; i < length; i++) {
-            const {key, path} = keys[i];
-            const storageData = this.get({key, path});
+            const key = keys[i];
+            const storageData = this.get({key});
             data.push({
                 key,
                 value: storageData
@@ -59,6 +58,6 @@ export const MiniAppStorage: IBaseStorage = {
         return data;
     },
     exist ({key}) {
-        return this.keys.indexOf(key) !== -1;
+        return this.keys().indexOf(key) !== -1;
     }
 };

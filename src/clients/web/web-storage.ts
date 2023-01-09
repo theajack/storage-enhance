@@ -1,8 +1,8 @@
 /*
  * @Author: tackchen
  * @Date: 2021-12-12 14:47:42
- * @LastEditors: tackchen
- * @LastEditTime: 2022-01-24 08:39:20
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2023-01-07 18:37:56
  * @FilePath: /storage-enhance/src/clients/web/web-storage.ts
  * @Description: Coding something
  */
@@ -14,7 +14,7 @@ import {IBaseStorage} from '../../type/storage';
 
 export const WebStorage: IBaseStorage = {
     name: 'web',
-    length ({type} = {}) {
+    count ({type} = {}) {
         return getStorageType(type).length;
     },
     keys ({type} = {}) {
@@ -64,8 +64,6 @@ export const WebStorage: IBaseStorage = {
         return getStorageType(type).hasOwnProperty(key);
     }
 };
-
-window.wstorage = WebStorage;
 
 function getStorageType (type: TStorageType = globalType()): Storage {
     return type === 'local' ? window.localStorage : window.sessionStorage;

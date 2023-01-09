@@ -1,8 +1,16 @@
+
+/*
+ * @Author: chenzhongsheng
+ * @Date: 2023-01-07 14:52:49
+ * @Description: Coding something
+ */
 const fs = require('fs');
 const path = require('path');
 const start = require('./test');
 const getAllCases = require('./get-cases');
-const storage = require('../public/node-dev.min');
+// const storage = require('../public/node-dev.min');
+const storage = require('../npm');
+
 
 start({
     storage,

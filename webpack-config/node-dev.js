@@ -1,3 +1,8 @@
+/*
+ * @Author: chenzhongsheng
+ * @Date: 2023-01-07 14:52:49
+ * @Description: Coding something
+ */
 const path = require('path');
 const webpack = require('webpack');
 
@@ -17,6 +22,7 @@ module.exports = {
         extensions: [ '.tsx', '.ts', '.js' ]
     },
     externals: {
+        'os': 'commonjs os',
         'fs': 'commonjs fs',
         'path': 'commonjs path'
     },

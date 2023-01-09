@@ -1,18 +1,236 @@
 {
     "passed": true,
-    "time": 1,
+    "time": 435,
     "results": [
         {
-            "result": {
-                "a": 1
-            },
-            "expect": {
-                "a": 1
-            },
+            "result": [
+                "k1",
+                "k2"
+            ],
+            "expect": [
+                "k1",
+                "k2"
+            ],
             "passed": true,
             "index": 0,
+            "time": 8,
+            "name": "测试 keys"
+        },
+        {
+            "result": 2,
+            "expect": 2,
+            "passed": true,
+            "index": 1,
+            "time": 6,
+            "name": "测试 count"
+        },
+        {
+            "result": 0,
+            "expect": 0,
+            "passed": true,
+            "index": 2,
+            "time": 4,
+            "name": "测试 clear"
+        },
+        {
+            "passed": true,
+            "index": 3,
+            "time": 2,
+            "name": "测试 remove"
+        },
+        {
+            "result": [
+                true,
+                true
+            ],
+            "expect": [
+                true,
+                true
+            ],
+            "passed": true,
+            "index": 4,
+            "time": 2,
+            "name": "测试 exist"
+        },
+        {
+            "result": "storage get test",
+            "expect": "storage get test",
+            "passed": true,
+            "index": 5,
+            "time": 29,
+            "name": "测试 onGet名称"
+        },
+        {
+            "result": "storage get function test",
+            "expect": "storage get function test",
+            "passed": true,
+            "index": 6,
+            "time": 28,
+            "name": "测试 onGet方法"
+        },
+        {
+            "result": "storage get function test",
+            "expect": "storage get function test",
+            "passed": true,
+            "index": 7,
             "time": 1,
-            "name": "测试times参数"
+            "name": "测试 onGet方法2"
+        },
+        {
+            "result": "storage get all function test",
+            "expect": "storage get all function test",
+            "passed": true,
+            "index": 8,
+            "time": 4,
+            "name": "测试 all onGet方法"
+        },
+        {
+            "result": "storage get all function test",
+            "expect": "storage get all function test",
+            "passed": true,
+            "index": 9,
+            "time": 2,
+            "name": "测试 onSet方法"
+        },
+        {
+            "passed": true,
+            "index": 10,
+            "time": 403,
+            "name": "测试 expires"
+        },
+        {
+            "result": "storage final test",
+            "expect": "storage final test",
+            "passed": true,
+            "index": 11,
+            "time": 1,
+            "name": "测试 final"
+        },
+        {
+            "result": "test protect result",
+            "expect": "test protect result",
+            "passed": true,
+            "index": 12,
+            "time": 1,
+            "name": "测试 protect"
+        },
+        {
+            "passed": true,
+            "index": 13,
+            "time": 1,
+            "name": "测试 remove"
+        },
+        {
+            "result": "string test",
+            "expect": "string test",
+            "passed": true,
+            "index": 14,
+            "time": 1,
+            "name": "测试 string"
+        },
+        {
+            "result": 100,
+            "expect": 100,
+            "passed": true,
+            "index": 15,
+            "time": 1,
+            "name": "测试 number"
+        },
+        {
+            "result": true,
+            "expect": true,
+            "passed": true,
+            "index": 16,
+            "time": 1,
+            "name": "测试 boolean"
+        },
+        {
+            "result": {
+                "a": 11
+            },
+            "expect": {
+                "a": 11
+            },
+            "passed": true,
+            "index": 17,
+            "time": 1,
+            "name": "测试 object"
+        },
+        {
+            "result": [
+                1,
+                2,
+                3
+            ],
+            "expect": [
+                1,
+                2,
+                3
+            ],
+            "passed": true,
+            "index": 18,
+            "time": 1,
+            "name": "测试 array"
+        },
+        {
+            "result": "Symbol(aa)",
+            "expect": "Symbol(aa)",
+            "passed": true,
+            "index": 19,
+            "time": 1,
+            "name": "测试 symbol"
+        },
+        {
+            "result": "2023-01-09T00:21:35.379Z",
+            "expect": "2023-01-09T00:21:35.379Z",
+            "passed": true,
+            "index": 20,
+            "time": 1,
+            "name": "测试 Date"
+        },
+        {
+            "result": 10,
+            "expect": 10,
+            "passed": true,
+            "index": 21,
+            "time": 1,
+            "name": "测试 func"
+        },
+        {
+            "result": {},
+            "expect": {},
+            "passed": true,
+            "index": 22,
+            "time": 1,
+            "name": "测试 reg"
+        },
+        {
+            "result": [
+                "storage onces test",
+                null
+            ],
+            "expect": [
+                "storage onces test",
+                null
+            ],
+            "passed": true,
+            "index": 23,
+            "time": 2,
+            "name": "测试 once"
+        },
+        {
+            "result": [
+                "storage times test",
+                null
+            ],
+            "expect": [
+                "storage times test",
+                null
+            ],
+            "passed": true,
+            "index": 24,
+            "time": 2,
+            "name": "测试 times"
         }
     ]
 }

@@ -1,7 +1,7 @@
 /*
  * @Author: tackchen
  * @Date: 2021-12-21 11:12:05
- * @LastEditors: tackchen
+ * @LastEditors: Please set LastEditors
  * @FilePath: /storage-enhance/src/plugins/times.ts
  * @Description: Coding something
  */
@@ -12,7 +12,7 @@ import {Storage} from '../adapter';
 
 export const TimesPlugin: IStoragePlugin = {
     name: 'times',
-    get ({options, data, storage, storageKey}) {
+    get ({options, data, storage, key}) {
         if (typeof data.times !== 'number') return data;
         if (data.times <= 1) {
             Storage.remove(options);
@@ -22,7 +22,7 @@ export const TimesPlugin: IStoragePlugin = {
         } else {
             data.times -= 1;
             storage.set({
-                key: storageKey,
+                key,
                 value: data
             });
         }

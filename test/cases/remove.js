@@ -13,7 +13,7 @@ module.exports = [{
         const value = this.expect;
         storage.set({key, value, protect: false});
         storage.remove({key});
-        return storage.get({key}).value;
+        return storage.get({key});
     },
     expect ({storage}) {
         return storage.EMPTY;

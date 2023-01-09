@@ -1,678 +1,341 @@
-# [tc-event](https://www.github.com/theajack/tc-event)
+# [storage-enhance](https://www.github.com/theajack/storage-enhance)
 
 <p>
-    <a href="https://www.github.com/theajack/tc-event"><img src="https://img.shields.io/github/stars/theajack/tc-event.svg?style=social" alt="star"></a>
+    <a href="https://www.github.com/theajack/storage-enhance"><img src="https://img.shields.io/github/stars/theajack/storage-enhance.svg?style=social" alt="star"></a>
     <a href="https://theajack.gitee.io"><img src="https://img.shields.io/badge/author-theajack-blue.svg?style=social" alt="Author"></a>
 </p> 
 
 <p>
-    <a href="https://www.npmjs.com/package/tc-event"><img src="https://img.shields.io/npm/v/tc-event.svg" alt="Version"></a>
-    <a href="https://npmcharts.com/compare/tc-event?minimal=true"><img src="https://img.shields.io/npm/dm/tc-event.svg" alt="Downloads"></a>
-    <a href="https://cdn.jsdelivr.net/npm/tc-event/tc-event.min.js"><img src="https://img.shields.io/bundlephobia/minzip/tc-event.svg" alt="Size"></a>
-    <a href="https://github.com/theajack/tc-event/blob/master/LICENSE"><img src="https://img.shields.io/npm/l/tc-event.svg" alt="License"></a>
-    <a href="https://github.com/theajack/tc-event/search?l=typescript"><img src="https://img.shields.io/github/languages/top/theajack/tc-event.svg" alt="TopLang"></a>
-    <a href="https://github.com/theajack/tc-event/issues"><img src="https://img.shields.io/github/issues-closed/theajack/tc-event.svg" alt="issue"></a>
-    <a href="https://github.com/theajack/tc-event/blob/master/test/test-report.txt"><img src="https://img.shields.io/badge/test-passed-44BB44" alt="test"></a>
+    <a href="https://www.npmjs.com/package/storage-enhance"><img src="https://img.shields.io/npm/v/storage-enhance.svg" alt="Version"></a>
+    <a href="https://npmcharts.com/compare/storage-enhance?minimal=true"><img src="https://img.shields.io/npm/dm/storage-enhance.svg" alt="Downloads"></a>
+    <a href="https://cdn.jsdelivr.net/npm/storage-enhance/storage-enhance.min.js"><img src="https://img.shields.io/bundlephobia/minzip/storage-enhance.svg" alt="Size"></a>
+    <a href="https://github.com/theajack/storage-enhance/blob/master/LICENSE"><img src="https://img.shields.io/npm/l/storage-enhance.svg" alt="License"></a>
+    <a href="https://github.com/theajack/storage-enhance/search?l=typescript"><img src="https://img.shields.io/github/languages/top/theajack/storage-enhance.svg" alt="TopLang"></a>
+    <a href="https://github.com/theajack/storage-enhance/issues"><img src="https://img.shields.io/github/issues-closed/theajack/storage-enhance.svg" alt="issue"></a>
+    <a href="https://github.com/theajack/storage-enhance/blob/master/test/test-report.txt"><img src="https://img.shields.io/badge/test-passed-44BB44" alt="test"></a>
 </p>
 
-<h3>🚀 功能强大、简单易用的事件库</h3>
+<h3>🚀 多端支持、功能强大的 Storage</h3>
 
-**[English](https://github.com/theajack/tc-event/blob/master/README.md) | [更新日志](https://github.com/theajack/tc-event/blob/master/helper/version.md) | [反馈错误/缺漏](https://github.com/theajack/tc-event/issues/new) | [Gitee](https://gitee.com/theajack/tc-event)**
+**[English](https://github.com/theajack/storage-enhance/blob/master/README.md) | [更新日志](https://github.com/theajack/storage-enhance/blob/master/helper/version.md) | [反馈错误/缺漏](https://github.com/theajack/storage-enhance/issues/new) | [Gitee](https://gitee.com/theajack/storage-enhance)**
 
 ---
 
 ### 1. 特性
 
 1. typescript 编写
-2. 多端支持
-3. 自定义事件顺序、多种触发模式
-4. 全局拦截机制
-5. 体积小巧，简单易用
+2. 多端(web、小程序、nodejs)支持，且保持api一致
+3. 支持自定义插件，对存取过程进行自定义操作
+4. 支持 final 模式，存储的数据不能被再次修改
+5. 支持 protect 模式，保护数据不会被普通模式的remove和clear删除
+6. 支持 times 模式，对存取数据操作进行次数限制
+7. 支持 expires 模式，设置数据过期时间
+8. 支持对存取删除操作进行时间监听
+9. 支持设置使用 temp 模式，仅存储在内存中，不写入磁盘
 
 ### 2. 快速使用
 
 #### 2.1 npm 安装
 
 ```
-npm i tc-event
+npm i storage-enhance
 ```
 
 ```js
-import event from 'tc-event';
-
-event.regist('myEvent', (data) => {
-    console.log('emited!', data);
-})
-
-event.emit('myEvent', 'Aha!');
+import storage from 'storage-enhance';
+storage.set('key', 'value');
 ```
 
 #### 2.2 cdn
 
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/tc-event/tc-event.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/storage-enhance"></script>
 <script>
-    TEvent.regist('myEvent', function (data) {
-        console.log('emited!', data);
-    })
-
-    TEvent.emit('myEvent', 'Aha!');
+    StorageEnhance.set('key', 'value');
 </script>
 ```
 
 ### 3 api
 
-详情请参考 [index.d.ts](https://github.com/theajack/tc-event/blob/master/src/index.d.ts)
+详情请参考 [index.d.ts](https://github.com/theajack/storage-enhance/blob/master/src/index.d.ts)
 
 ```ts
-interface IEventStatic {
-    version: string;
-    EVENT: IJson<string>; // 事件枚举
-    emit(name: TEventName, data?: any): boolean; // 触发事件
-    onEmit(fn: IOnInterceptorEmit): void;
-    regist(name: TEventName, listener: IEventListener | IEventRegistOption): IEventItem;
-    regist(name: TEventName): ILink;
-    regist(name: IJson<IEventRegistOption>): IJson<IEventItem>;
-    regist(name: IRegistObject): IEventItem;
-    onRegist(fn: IOnInterceptorRegist): void;
-    checkEvent(name: TEventName): boolean; // 检查是否存在事件
-    remove(name: TEventName, cond: number | IEventListener, imme?: boolean): boolean;
-    remove(eventItem: IEventItem, imme?: boolean): boolean;
-    clear(name?: TEventName | TEventName[]): void;
-    order(name: TEventName): number;
-    registNotImmediate(name: TEventName, listener: IEventListener): IEventItem;
-    registNotImmediateOnce(name: TEventName, listener: IEventListener): IEventItem;
-    registOnce(name: TEventName, listener: IEventListener): IEventItem;
-    registSingle(name: TEventName, listener: IEventListener): IEventItem;
-}
-```
+export interface IStorage extends IBaseStorageFuncs {
+    env: TStorageEnv;
+    TYPE: IJson<TStorageType>;
+    count(options?: IStorageTypeArg): number;
+    keys(options?: IStorageTypeArg): string[];
+    clear(options?: IStorageClearArg): boolean;
+    exist(key: string, options: IStorageKeyArg): boolean;
+    remove(key: string, options: IStorageRemoveArg): boolean;
 
-### 4 使用实例
-
-#### 4.1 checkEvent
-
-判断事件是否存在
-
-```js
-const eventName = 'test-checkEvent';
-const result = [];
-result.push(event.checkEvent(eventName));
-event.regist(eventName, () => {});
-result.push(event.checkEvent(eventName));
-event.emit(eventName);
-result.push(event.checkEvent(eventName));
-event.clear(eventName);
-result.push(event.checkEvent(eventName));
-event.regist(eventName, () => {});
-result.push(event.checkEvent(eventName));
-event.clear();
-result.push(event.checkEvent(eventName));
-console.log(result);
-// [false, true, true, false, true, false]
-```
-
-#### 4.2 clear 方法
-
-清除单个或所有事件
-
-```js
-const eventName = 'test-clear';
-const result = [];
-event.regist(eventName, () => {
-    result.push(1);
-});
-event.emit(eventName);
-event.clear(eventName);
-event.emit(eventName);
-event.regist(eventName, {
-    immediate: false,
-    listener: () => {
-        result.push(2);
-    }
-});
-event.emit(eventName);
-event.clear();
-event.emit(eventName);
-console.log(result);
-// [1, 2]
-```
-
-#### 4.3 immediate 参数
-
-immediate 参数表示注册事件时，如果该事件已经被触发过，是否需要立即触发当前的事件
-
-默认值为 true
-
-```js
-const eventName = 'test-immediate';
-const result = [];
-event.emit(eventName);
-
-event.regist(eventName, () => {
-    result.push(1);
-});
-event.regist(eventName, {
-    immediate: true,
-    listener () { result.push(2);}
-});
-event.regist(eventName, {
-    immediate: false,
-    listener () {result.push(3);}
-});
-console.log(result);
-// [1, 2]
-```
-
-#### 4.4 index 参数
-
-index 参数表示注册事件时，希望插入的位置
-
-```js
-const eventName = 'test-order';
+    set(key: string, value: any, options?: IStorageSetOption): boolean;
+    set(options: IStorageSetOption): boolean;
+    set(array: (IStorageSetOption)[]): boolean;
     
-const result = [];
-event.regist(eventName, () => {
-    result.push(1); // 1
-});
-event.regist(eventName, () => {
-    result.push(2); // 1 2
-});
-event.regist(eventName, () => {
-    result.push(3); // 1 2 3
-});
-event.regist(eventName, () => {
-    result.push(4); // 1 2 3 4
-});
-event.regist(eventName, {
-    index: 0,  // 5 1 2 3 4
-    listener () {result.push(5);}
-});
-event.regist(eventName, {
-    index: 2, // 5 1 6 2 3 4
-    listener () {result.push(6);}
-});
-event.regist(eventName, {
-    index: 1, // 5 7 1 6 2 3 4
-    listener () {result.push(7);}
-});
-event.regist(eventName, {
-    index: 100, // 5 7 1 6 2 3 4 8
-    listener () {result.push(8);}
-});
-event.regist(eventName, {
-    index: -3, // 9 5 7 1 6 2 3 4 8
-    listener () {result.push(9);}
-});
-event.emit(eventName);
-console.log(result);
-// [9, 5, 7, 1, 6, 2, 3, 4, 8]
+    get(key: string): any;
+    get(options: IStorageGetOption): any;
+    get(array: IStorageGetOption[]): any[];
+
+    all(options?: IStorageTypeArg & IStorageDetailArg): IKeyPathValuePair[];
+    use(...plugins: IStoragePlugin[]): void;
+    plugins(): IStoragePlugin[];
+    registScope(arg1: string | IJson<IEvent | any>, arg2?: IEvent | any): void;
+    scope(): void;
+    type: TStorageType;
+    EMPTY: Symbol;
+}
 ```
 
-#### 4.5 interceptor
+### 4 基础读取方法
 
-全局拦截器，支持 onRegist 和 onEmit
+#### 4.1 set 存储数据
 
 ```js
-const eventName1 = 'test-interceptor1';
-const eventName2 = 'test-interceptor2';
-const result = [];
-event.onRegist(({name, item}) => {
-    result.push(`onRegist: ${name}`);
-});
-event.onEmit(({name, item, data, firstEmit}) => {
-    result.push(`onEmit: ${name} ${data} ${firstEmit}`);
-});
-event.regist(eventName1, () => {});
-event.regist(eventName2, () => {});
-event.emit(eventName1, `${eventName1} data`);
-event.emit(eventName2, `${eventName2} data`);
-event.emit(eventName2, `${eventName2} data2`);
-console.log(result);
-/*
-    [
-        'onRegist: test-interceptor1',
-        'onRegist: test-interceptor2',
-        'onEmit: test-interceptor1 test-interceptor1 data true',
-        'onEmit: test-interceptor2 test-interceptor2 data true',
-        'onEmit: test-interceptor2 test-interceptor2 data2 false'
-    ]
-*/
+storage.set('key', 'value', options);
+storage.set(options);
+storage.set([options, options]);
 ```
 
-#### 4.6 once 参数
+options 用于传入一些可选配置
 
-once 参数 是否只触发依次
+set方法有以下 options
 
-```js
-const eventName = 'test-once';
-const result = [];
-
-event.regist(eventName, () => {
-    result.push(1);
-});
-event.regist(eventName, {
-    once: true,
-    listener () { result.push(2);}
-});
-event.regist(eventName, {
-    once: false,
-    listener () {result.push(3);}
-});
-event.emit(eventName);
-event.emit(eventName);
-console.log(result);
-// [1, 2, 3, 1, 3]
+```ts
+interface IStorageSetOption {
+    key?: string;
+    value?: any;
+    onGet?: string | IEvent;
+    onSet?: string | IEvent;
+    onRemove?: string | IEvent;
+    expires?: number; // 过期时间 datetime
+    once?: boolean; // 是否是一次性的
+    times?: number; // 可读取次数
+    path?: string;
+    final?: boolean; // 是否是不可改变的
+    protect?: boolean; // 是否可以被删除的
+    type?: 'local' | 'session' | 'temp' | 'cookie'; // 当前操作使用什么类型
+    cookie?: { // 仅对 web环境下 启用 type=cookie时有效
+        secure?: boolean; // default: false
+        sameSite?: ICookieSameSite; // default: Lax
+        priority?: ICookiePriority; // default: Medium
+        sameParty?: boolean; // default: false
+        expires?: Date | number; // default is session
+        path?: string; // default
+    };
+}
 ```
 
-#### 4.7 times 参数
-
-times 参数 监听触发的次数
+#### 4.2 get 读取数据
 
 ```js
-const eventName = 'test-times';
-const result = [];
-
-event.regist(eventName, {
-    times: 1,
-    listener () { result.push(1);}
-});
-event.regist(eventName, {
-    times: 2,
-    listener () { result.push(2);}
-});
-event.regist(eventName, {
-    times: 3,
-    listener () { result.push(3);}
-});
-event.emit(eventName);
-event.emit(eventName);
-event.emit(eventName);
-event.emit(eventName);
-// [1, 2, 3, 2, 3, 3]
+storage.get('key', options);
+storage.get(options);
+storage.get([options, options]);
 ```
 
-#### 4.8 order 参数
+options 用于传入一些可选配置
 
-控制插入事件的序号（和 index参数有区别）
+get方法有以下 options
 
-```js
-const eventName = 'test-order';
-            
-const result = [];
-event.regist(eventName, () => {
-    result.push(1); // 1
-});
-event.regist(eventName, () => {
-    result.push(2); // 1 2
-});
-event.regist(eventName, {
-    order: 0, // 0 1 2
-    listener () {result.push(3);}
-});
-event.regist(eventName, {
-    order: 1, // 0 1 *1 2
-    listener () {result.push(4);}
-});
-event.regist(eventName, {
-    order: 1, // 0 1 *1 **1 2
-    listener () {result.push(5);}
-});
-event.regist(eventName, {
-    order: 1, // 0 ***1 1 *1 **1 2
-    orderBefore: true,
-    listener () {result.push(6);}
-});
-event.regist(eventName, {
-    order: 10, // 0 ***1 1 *1 **1 2 10
-    listener () {result.push(7);}
-});
-event.regist(eventName, () => { // 0 ***1 1 *1 **1 2 3 10
-    result.push(8);
-});
-event.emit(eventName);
-console.log(result);
+```ts
+interface IStorageGetOption{
+    key?: string;
+    type?: 'local' | 'session' | 'temp' | 'cookie'; // 当前操作使用什么类型
+    detail?: boolean; // 是否需要展示数据详细信息
+}
 ```
 
-#### 4.9 single 参数
-
-单例监听模式，对某个事件名启用 single 参数会覆盖之前该事件的所有监听函数
-
-且之后该事件无需再带上 single 参数
-
-启用single参数时， index order orderBefore 参数无效
+#### 4.3 remove 删除数据
 
 ```js
-const eventName = 'test-single';
-const result = [];
+storage.remove('key', options);
+storage.remove(options);
+```
 
-event.regist(eventName, () => {
-    result.push(1);
-});
-event.emit(eventName);
-// 测试覆盖旧方法
-event.regist(eventName, {
-    single: true,
-    immediate: false,
-    listener: () => {
-        result.push(2);
+options 用于传入一些可选配置
+
+remove方法有以下 options
+
+```ts
+interface IStorageRemoveOption{
+    key?: string;
+    type?: 'local' | 'session' | 'temp' | 'cookie'; // 当前操作使用什么类型
+    protect?: boolean; // 是否删除protect类型
+    cookie?: {
+        path?: string;
+        domain?: string;
     }
-});
-event.emit(eventName);
-event.clear(eventName);
-
-event.regist(eventName, {
-    single: true,
-    listener () { result.push(3);}
-});
-event.regist(eventName, {
-    single: true,
-    listener () { result.push(4);}
-});
-event.emit(eventName);
-// 测试single参数缓存
-event.regist(eventName, {
-    immediate: false,
-    listener () { result.push(5);}
-});
-event.emit(eventName);
-console.log(result);
-// [1, 2, 4, 5]
+}
 ```
-#### 4.10 name 参数
 
-name 参数用来给一个监听增加一个参数
-
-默认值为 eventName + id
+#### 4.4 clear 清空数据
 
 ```js
-const eventName = 'test-name';
-    
-const item1 = event.regist(eventName, () => {
-});
-const item2 = event.regist(eventName, {
-    name: 'listener-name',
-    listener () {}
-});
-// item1.name === 'test-name-1'
-// item2.name === 'listener-name'
+storage.clear();
+storage.clear(options);
 ```
 
-#### 4.11 head 参数
+options 用于传入一些可选配置
 
-head参数用于将监听添加到事件头部
-
-```js
-const eventName = 'test-head';
-const result = [];
-event.regist(eventName, () => {
-    result.push(1);
-});
-event.regist(eventName, {
-    order: -1,
-    listener () {result.push(2);}
-});
-event.regist(eventName, {
-    index: -1,
-    listener () {result.push(3);}
-});
-event.regist(eventName, {
-    head: true,
-    listener () {result.push(4);}
-});
-event.regist(eventName, {
-    head: true,
-    listener () {result.push(5);}
-});
-event.emit(eventName);
-// result: [5, 4, 3, 2, 1]
-```
-
-#### 4.12 tail 参数
-
-tail参数用于将监听添加到事件尾部
-
-```js
-const eventName = 'test-tail';
-const result = [];
-event.regist(eventName, () => {
-    result.push(1);
-});
-event.regist(eventName, {
-    order: 100,
-    listener () {result.push(2);}
-});
-event.regist(eventName, {
-    index: 100,
-    listener () {result.push(3);}
-});
-event.regist(eventName, {
-    listener () {result.push(4);}
-});
-event.regist(eventName, {
-    tail: true,
-    listener () {result.push(5);}
-});
-event.regist(eventName, {
-    tail: true,
-    listener () {result.push(6);}
-});
-event.emit(eventName);
-// result: [1, 4, 2, 3, 5, 6]
-```
-
-#### 4.13 order 函数
-
-获取某个监听的序号
-
-```js
-const eventName = 'test-order-fn';
-const result = [];
-
-event.regist(eventName, () => {
-    result.push(1);
-});
-event.regist(eventName, () => {
-    result.push(2);
-});
-const e1 = event.regist(eventName, () => {
-    result.push(3);
-});
-const e2 = event.regist(eventName, {
-    order: 1,
-    listener () { result.push(4);}
-});
-event.regist(eventName, () => {
-    result.push(5);
-});
-event.emit(eventName);
-console.log([result, event.order(eventName), e1.order, e2.order]);
-// [[1, 4, 2, 3, 5], 4, 3, 1
-```
-
-#### 4.14 remove 函数
-
-移除事件监听
-
-```js
-const eventName = 'test-remove';
-const result = [];
-const l4 = () => { result.push(4); };
-const l5 = () => { result.push(5); };
-const l6 = () => { result.push(6); };
-const l7 = () => { result.push(7); };
-event.regist(eventName, () => {
-    result.push(1);
-});
-event.regist(eventName, () => {
-    result.push(2);
-});
-event.regist(eventName, () => {
-    result.push(3);
-    event.remove(eventName, l4, true);
-    event.remove(eventName, l5);
-    event.regist(eventName, l7);
-});
-event.regist(eventName, l4);
-event.regist(eventName, l5);
-event.regist(eventName, l6);
-event.remove(eventName, l6);
-event.emit(eventName);
-event.emit(eventName);
-console.log(result);
-// [1, 2, 3, 7, 5, 1, 2, 3, 7, 7]
-```
-
-#### 4.15 registNotImmediate
-
-```js
-event.registNotImmediate('xxx', ()=>{})
-// 等价于
-event.regist('xxx', {
-    immediate: false,
-    listener: ()=>{}
-})
-```
-
-#### 4.16 registOnce
-
-```js
-event.registOnce('xxx', ()=>{})
-// 等价于
-event.regist('xxx', {
-    once: true,
-    listener: ()=>{}
-})
-```
-
-#### 4.17 registNotImmediateOnce
-
-```js
-event.registNotImmediateOnce('xxx', ()=>{})
-// 等价于
-event.regist('xxx', {
-    immediate: false,
-    once: true,
-    listener: ()=>{}
-})
-```
-
-#### 4.18 registSingle
-
-```js
-event.registSingle('xxx', ()=>{})
-// 等价于
-event.regist('xxx', {
-    single: true,
-    listener: ()=>{}
-})
-```
-
-#### 4.19 监听回调参数
-
-监听函数第二个参数是一个json，包含有三个属性
-
-1. firstEmit 表示该监听是否是首次触发
-2. remove 是移除当前监听的方法
-3. clear 是移除当前事件的方法
-4. item 是当前的监听对象
-
-```js
-event.regist('xxx', (data, {firstEmit, item, remove, clear})=>{
-
-})
-```
-
-#### 4.20 链式调用
-
-regist函数当指传入事件名时会启用链式调用
-
-所有参数都可通过链式调用，所有api都是可选的，最后需要通过 listen 方法触发监听
-
-
-```js
-event.regist('xxx')
-    .index(1)
-    .order(1)
-    .orderBefore()
-    .notImmediate()
-    .single()
-    .once()
-    .times(1)
-    .listener()
-    .name('xxx')
-    .head()
-    .tail()
-    .listen();
-```
-
-声明文件如下
+clear 方法有以下 options
 
 ```ts
-interface ILink {
-    single: (single: boolean) => ILink;
-    notImmediate: (immediate: boolean) => ILink;
-    once: (once: boolean) => ILink;
-    index: (index: number) => ILink;
-    order: (order: number) => ILink;
-    orderBefore: (orderBefore: boolean) => ILink;
-    listener: (listener: IEventListener) => ILink;
-    name: (name: string) => ILink;
-    head: () => ILink;
-    tail: ()=> ILink;
-    times: (times: number)=> ILink;
-    listen: (listener?: IEventListener) => IEventItem;
+interface IStorageClearOption{
+    protect?: boolean; // 是否删除protect类型
+    type?: 'local' | 'session' | 'temp' | 'cookie'; // 当前操作使用什么类型
+    cookie?: {
+        path?: string;
+        domain?: string;
+    }
 }
 ```
 
-### 5 ts 接口
+#### 4.5 keys 获取所有的数据key
 
- 1. IEventRegistOption
- 2. IRegistObject
- 3. IEventListener
- 5. IEventItem
+```js
+storage.keys();
+storage.keys(options);
+```
 
-详情请参考 [index.d.ts](https://github.com/theajack/tc-event/blob/master/src/index.d.ts)
+options 用于传入一些可选配置
+
+keys 方法有以下 options
 
 ```ts
-export interface IEventRegistOption {
-    listener: IEventListener;
-    immediate?: boolean;
-    once?: boolean;
-    times?: number;
-    order?: number;
-    orderBefore?: boolean;
-    index?: number;
-    single?: boolean;
-    head?: boolean;
-    tail?: boolean;
-    name?: string;
-}
-export interface IRegistObject {
-    [key: string]: IEventRegistOption;
-}
-export interface IEventListener {
-    (data: any, listenOption: {
-        firstEmit: boolean;
-        item: IEventItem;
-        remove: () => boolean;
-        clear: () => boolean;
-    }): void;
-}
-export interface IEventItem {
-    eventName: TEventName;
-    listener: IEventListener;
-    immediate: boolean;
-    once: boolean;
-    order: number;
-    orderBefore: boolean;
-    hasTrigger: boolean;
-    id: number;
-    single: boolean;
-    name: string;
-    head: boolean;
-    tail: boolean;
-    times: number;
-    timesLeft: number;
+interface IStorageKeysOption{
+    type?: 'local' | 'session' | 'temp' | 'cookie'; // 当前操作使用什么类型
 }
 ```
+
+#### 4.6 count 获取数据个数
+
+```js
+storage.count();
+storage.count(options);
+```
+
+options 用于传入一些可选配置
+
+count 方法有以下 options
+
+```ts
+interface IStorageCountOption{
+    type?: 'local' | 'session' | 'temp' | 'cookie'; // 当前操作使用什么类型
+}
+```
+
+#### 4.7 exist 检查某key是否存在
+
+```js
+storage.exist(key, options);
+storage.exist(options);
+```
+
+options 用于传入一些可选配置
+
+exist 方法有以下 options
+
+```ts
+interface IStorageExistOption {
+    key?: string;
+    type?: 'local' | 'session' | 'temp' | 'cookie'; // 当前操作使用什么类型
+}
+```
+
+#### 4.8 all 获取所有数据
+
+```js
+storage.all();
+storage.all(options);
+```
+
+options 用于传入一些可选配置
+
+all 方法有以下 options
+
+```ts
+interface IStorageExistOption {
+    type?: 'local' | 'session' | 'temp' | 'cookie'; // 当前操作使用什么类型
+}
+```
+
+### 5 插件机制
+
+storage-enhance 可以接入第三方用户的自定义插件来修改数据存取过程
+
+#### 5.1 插件定义
+
+以下是一个插件的接口
+
+详情请参考 [plugin.d.ts](https://github.com/theajack/storage-enhance/blob/master/src/type/plugin.d.ts)
+
+```ts
+interface IStoragePlugin {
+    name: TPluginName;
+    beforeGet?(options: IPluginBeforeGetOptions): IStorageGetOption;
+    get?(options: IPluginGetOptions): IStorageData | symbol;
+    set?(options: IPluginSetOptions): IStorageData | boolean;
+    remove?(options: IPluginRemoveOptions): boolean;
+}
+```
+
+以下是一个给每个键增加一个 'test' 前缀的插件示例
+
+```ts
+
+export const TestPlugin: IStoragePlugin = {
+    name: 'add-test',
+    beforeGet ({options}) {
+        options.key = `test_${options.key}`;
+        return options;
+    },
+    set ({options, data, prevData}) {
+        options.key = `test_${options.key}`;
+        return data;
+    },
+};
+```
+
+其他示例可以参考[plugins](https://github.com/theajack/storage-enhance/tree/master/src/plugins)
+
+#### 5.2 使用插件
+
+```js
+import storage from 'storage-enhance';
+storage.use(TestPlugin);
+
+storage.plugins(); // 获取已安装插件
+```
+
+### 6 其他接口
+
+#### 6.1 type 属性
+
+```js
+storage.type = 'cookie'; // 使用cookie代替localStorage
+storage.type = 'session'; // 使用session代替localStorage
+// 可选值： 'local' | 'session' | 'temp' | 'cookie';
+
+storage.TYPE.LOCAL; // 
+```
+
+#### 6.2 EMPTY 属性
+
+```js
+storage.EMPTY; // 表示空值，symbol类型
+```
+
+
+#### 6.3 scope
+
+scope 用于注册全局唯一的方法或属性，主要用于插件机制中以规避重复注册方法的出现
+
+```js
+storage.registScope('testAttr', () => 1);
+storage.registScope('testAttr', () => 2);
+
+storage.scope().testAttr(); // 2
+```
+

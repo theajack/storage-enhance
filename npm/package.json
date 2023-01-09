@@ -1,12 +1,12 @@
 {
     "name": "storage-enhance",
     "version": "0.0.1",
-    "description": "Powerful, easy-to-use event mechanism",
+    "description": "Support multi-end enhanced storage js library",
     "main": "storage-enhance.min.js",
     "scripts": {},
     "unpkg": "storage-enhance.min.js",
     "jsdelivr": "storage-enhance.min.js",
-    "typings": "storage-enhance.min.d.ts",
+    "typings": "index.d.ts",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/theajack/storage-enhance.git"

@@ -1,11 +1,33 @@
 
-测试结果: 通过
-测试用例数: 1
-总耗时: 1ms
+%c测试结果: 通过
+测试用例数: 25
+总耗时: 435ms
 ----------------------------
 测试用例详细数据:
 ----------------------------
-【测试times参数】: 通过 / 1ms
-输出结果: {"a":1}
-
-
+%c【测试 keys】: 通过(8ms); [输出结果]: ["k1","k2"];
+%c【测试 count】: 通过(6ms); [输出结果]: 2;
+%c【测试 clear】: 通过(4ms); [输出结果]: 0;
+%c【测试 remove】: 通过(2ms); [输出结果]: Symbol(storage-empty);
+%c【测试 exist】: 通过(2ms); [输出结果]: [true,true];
+%c【测试 onGet名称】: 通过(29ms); [输出结果]: storage get test;
+%c【测试 onGet方法】: 通过(28ms); [输出结果]: storage get function test;
+%c【测试 onGet方法2】: 通过(1ms); [输出结果]: storage get function test;
+%c【测试 all onGet方法】: 通过(4ms); [输出结果]: storage get all function test;
+%c【测试 onSet方法】: 通过(2ms); [输出结果]: storage get all function test;
+%c【测试 expires】: 通过(403ms); [输出结果]: Symbol(storage-empty);
+%c【测试 final】: 通过(1ms); [输出结果]: storage final test;
+%c【测试 protect】: 通过(1ms); [输出结果]: test protect result;
+%c【测试 remove】: 通过(1ms); [输出结果]: Symbol(storage-empty);
+%c【测试 string】: 通过(1ms); [输出结果]: string test;
+%c【测试 number】: 通过(1ms); [输出结果]: 100;
+%c【测试 boolean】: 通过(1ms); [输出结果]: true;
+%c【测试 object】: 通过(1ms); [输出结果]: {"a":11};
+%c【测试 array】: 通过(1ms); [输出结果]: [1,2,3];
+%c【测试 symbol】: 通过(1ms); [输出结果]: Symbol(aa);
+%c【测试 Date】: 通过(1ms); [输出结果]: Mon Jan 09 2023 08:21:35 GMT+0800 (中国标准时间);
+%c【测试 func】: 通过(1ms); [输出结果]: 10;
+%c【测试 reg】: 通过(1ms); [输出结果]: /a[b|c]/g;
+%c【测试 once】: 通过(2ms); [输出结果]: ["storage onces test",null];
+%c【测试 times】: 通过(2ms); [输出结果]: ["storage times test",null];
+----------------------------

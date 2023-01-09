@@ -5,11 +5,11 @@
     "scripts": {
         "dev": "webpack-dev-server --open --config webpack-config/dev.js",
         "dev:node": "webpack --config webpack-config/node-dev.js",
-        "dev:test": "webpack-dev-server --open --config webpack-config/test-web.js",
         "build": "webpack --config webpack-config/build.js",
         "lint": "eslint src --ext js",
         "publish": "npm publish npm",
-        "test": "node test/index.js"
+        "test:node": "node test/test-node.js",
+        "test:web": "webpack-dev-server --open --config webpack-config/test-web.js"
     },
     "author": "theajack",
     "repository": {

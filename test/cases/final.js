@@ -14,7 +14,7 @@ module.exports = [{
         const value = this.expect;
         storage.set({key, value, final: true});
         storage.set({key, value: 'new value'});
-        return storage.get({key}).value;
+        return storage.get({key});
     },
     expect: 'storage final test',
 }];

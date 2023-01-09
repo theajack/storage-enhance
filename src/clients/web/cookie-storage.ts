@@ -2,7 +2,7 @@
  * @Author: tackchen
  * @Date: 2021-12-22 09:21:03
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2023-01-05 09:08:44
+ * @LastEditTime: 2023-01-07 22:38:37
  * @FilePath: /storage-enhance/src/clients/web/cookie-storage.ts
  * @Description: Coding something
  */
@@ -13,7 +13,7 @@ import {IBaseStorage, IKeyValuePair} from '../../type/storage';
 
 export const CookieStorage: IBaseStorage = {
     name: 'cookie',
-    length () {
+    count () {
         return Cookie.getCookieValuePairs().length;
     },
     keys () {
@@ -25,22 +25,21 @@ export const CookieStorage: IBaseStorage = {
         const value = Cookie.get({key});
         return parseStorageValue(value);
     },
-    set ({key, value, path, cookie}) {
+    set ({key, value, cookie}) {
         try {
-            Cookie.set({key, value: JSON.stringify(value), path, ...cookie});
+            Cookie.set({key, value: JSON.stringify(value), ...cookie});
             return true;
         } catch (e) {
             return false;
         }
     },
-    remove ({key, domain}) {
-        return Cookie.remove({key, domain});
+    remove ({key, cookie}) {
+        return Cookie.remove({key, ...cookie});
     },
-    clear ({domain} = {}) {
+    clear ({cookie} = {}) {
         const keys = this.keys();
         for (let i = 0, length = keys.length; i < length; i++) {
-            const {key, path} = keys[i];
-            this.remove({key, path, domain});
+            this.remove({key: keys[i], ...cookie});
         }
         return true;
     },

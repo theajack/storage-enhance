@@ -14,7 +14,7 @@ module.exports = [{
         const value = this.expect;
         storage.set({key, value, protect: true});
         storage.remove({key});
-        return storage.get({key}).value;
+        return storage.get({key});
     },
     expect: 'test protect result',
 }];

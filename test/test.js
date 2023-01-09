@@ -1,8 +1,13 @@
+/*
+ * @Author: chenzhongsheng
+ * @Date: 2023-01-07 14:52:49
+ * @Description: Coding something
+ */
 const {startTest} = require('easy-test-lib');
 const lib = require('./lib');
 
 module.exports = ({cases, onComplete, storage, type = 'local'}) => {
-    storage.type(type);
+    storage.type = type;
     startTest({
         args: {
             storage,

@@ -2,12 +2,12 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:30:47
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2023-01-05 09:07:39
+ * @LastEditTime: 2023-01-07 23:48:43
  * @FilePath: /storage-enhance/src/type/storage.d.ts
  * @Description: Coding something
  */
 import {TStorageEnv, TStorageName, TStorageType} from './constant';
-import {ICookieDomain, ICookieOption} from './cookie';
+import {ICookieOption, ICookieRemoveOption} from './cookie';
 import {IStoragePlugin} from './plugin';
 import {IJson} from './util';
 
@@ -17,33 +17,33 @@ export interface IStorageTypeArg {
     type?: TStorageType;
 }
 
-export interface IStoragePathArg {
-    path?: string;
-}
-
-export interface IStorageTypePathArg extends IStorageTypeArg, IStoragePathArg {
+export interface IStorageTypePathArg extends IStorageTypeArg {
 }
 
 export interface IStorageDetailArg {
     detail?: boolean;
 }
 
-export interface IStorageClearArg extends IStorageTypeArg, ICookieDomain, IStorageProtectType {
+export interface IStorageClearArg extends IStorageTypeArg, IStorageProtectType, ICookieRemoveOption {
+    cookie?: ICookieRemoveOption;
 }
 
 export interface IStorageKeyArg extends IStorageTypeArg {
     key: TStorageKey;
+    type?: TStorageType;
 }
 
-export interface IAdapterStorageKeyArg extends
+export interface IStorageGetOption extends
     IStorageKeyArg,
     IStorageDetailArg {
+    cookie?: ICookieRemoveOption;
 }
 
-export interface IStorageRemoveArg extends IStorageKeyArg, ICookieDomain, IStorageProtectType {
+export interface IStorageRemoveArg extends IStorageKeyArg, IStorageProtectType {
+    cookie?: ICookieRemoveOption;
 }
 
-export interface IBaseStorageSetValueArg extends IStorageKeyArg, IStoragePathArg {
+export interface IBaseStorageSetValueArg extends IStorageKeyArg {
     value: IStorageData;
     cookie?: ICookieOption;
 }
@@ -54,7 +54,7 @@ export interface IKeyPathPair {
 }
 export interface IKeyValuePair {
     key: TStorageKey;
-    value: string;
+    value: any;
 }
 export interface IKeyOriginValuePair {
     key: TStorageKey;
@@ -62,11 +62,8 @@ export interface IKeyOriginValuePair {
 }
 
 export interface IBaseStorageFuncs {
-    length(options?: IStorageTypeArg): number;
+    count(options?: IStorageTypeArg): number;
     clear(options?: IStorageClearArg): boolean;
-    get(options: IStorageKeyArg): TStorageOriginData;
-    remove(options: IStorageRemoveArg): boolean;
-    exist(options: IStorageKeyArg): boolean;
 }
 
 export interface IBaseStorage extends IBaseStorageFuncs {
@@ -74,29 +71,38 @@ export interface IBaseStorage extends IBaseStorageFuncs {
     keys(options?: IStorageTypeArg): string[];
     all(options?: IStorageTypeArg): IKeyOriginValuePair[];
     set(options: IBaseStorageSetValueArg): boolean;
+    get(options: IStorageKeyArg): TStorageOriginData;
+    remove(options: IStorageRemoveArg): boolean;
+    exist(options: IStorageKeyArg): boolean;
 }
+
 export interface IStorage extends IBaseStorageFuncs {
     env: TStorageEnv;
-    length(options?: IStorageTypeArg & IStoragePathArg): number;
-    keys(options?: IStorageTypeArg & IStoragePathArg): IKeyPathPair[];
-    clear(options?: IStorageClearArg & IStoragePathArg): boolean;
-    exist(options: IStorageKeyArg & IStoragePathArg): boolean;
-    remove(options: IStorageRemoveArg & IStoragePathArg): boolean;
-
-    set(key: string, value: any, options?: IStorageCommonSetOption & IStoragePathArg): boolean;
-    setWithOptions(options: IStorageCommonSetOption & IStoragePathArg): boolean;
-    setWithArray(array: (IStorageCommonSetOption & IStoragePathArg)[]): boolean;
+    TYPE: IJson<TStorageType>;
+    count(options?: IStorageTypeArg): number;
+    keys(options?: IStorageTypeArg): string[];
+    clear(options?: IStorageClearArg): boolean;
     
-    get(options: IAdapterStorageKeyArg): IKeyPathValuePair;
-    getWithString(key: string): IKeyPathValuePair;
-    getWithArray(array: IAdapterStorageKeyArg[]): IKeyPathValuePair[];
+    exist(key: string, options: IStorageKeyArg): boolean;
+    exist(options: IStorageKeyArg): boolean;
+    
+    remove(key: string, options: IStorageRemoveArg): boolean;
+    remove(options: IStorageRemoveArg): boolean;
 
-    all(options?: IStorageTypeArg & IStorageDetailArg & IStoragePathArg): IKeyPathValuePair[];
+    set(key: string, value: any, options?: IStorageSetOption): boolean;
+    set(options: IStorageSetOption): boolean;
+    set(array: (IStorageSetOption)[]): boolean;
+    
+    get(key: string): any;
+    get(options: IStorageGetOption): any;
+    get(array: IStorageGetOption[]): any[];
+
+    all(options?: IStorageTypeArg & IStorageDetailArg): IKeyPathValuePair[];
     use(...plugins: IStoragePlugin[]): void;
     plugins(): IStoragePlugin[];
     registScope(arg1: string | IJson<IEvent | any>, arg2?: IEvent | any): void;
-    scope(): void;
-    type(type?: TStorageType): TStorageType | void;
+    scope(): IJson;
+    type: TStorageType;
     EMPTY: Symbol;
 }
 
@@ -114,14 +120,12 @@ export interface IStorageBaseOption extends IStorageProtectType {
     times?: number; // 可读取次数
     // compress?: boolean; // 是否压缩存储
     // encrypt?: boolean; // 是否为加密存储
-    path?: string;
     final?: boolean; // 是否是不可改变的
 }
 
 
 export interface IStorageData extends IStorageBaseOption {
     type: TStorageDataType;
-    path?: string;
     onGet?: string;
     onSet?: string;
     onRemove?: string;
@@ -142,7 +146,7 @@ export interface IEvent {
     (options: IEventOption): void;
 }
 
-export interface IStorageCommonSetOption extends IStorageBaseOption, IStorageKeyArg {
+export interface IStorageSetOption extends IStorageBaseOption, IStorageKeyArg {
     cookie?: ICookieOption;
     onGet?: string | IEvent;
     onSet?: string | IEvent;

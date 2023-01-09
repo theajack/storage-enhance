@@ -2,49 +2,46 @@
  * @Author: tackchen
  * @Date: 2021-12-12 14:04:14
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2023-01-05 09:10:06
+ * @LastEditTime: 2023-01-07 23:39:01
  * @FilePath: /storage-enhance/src/adapter.ts
  * @Description: Coding something
  */
 
-// import {MiniAppStorage} from './clients/miniapp/miniapp-storage';
+import {MiniAppStorage} from './clients/miniapp/miniapp-storage';
 import {WebStorage} from './clients/web/web-storage';
-// import {NodeStorege} from './clients/node/node-storage';
+import {NodeStorage} from './clients/node/node-storage';
 import {getDataConvert, setDataConvert} from './convert/converter';
 import {StorageEnv} from './convert/storage-env';
 import {globalType, setGlobalType} from './convert/storage-type';
-// import {TempStorege} from './temp/temp-storage';
-import {TStorageType} from './type/constant';
-import {IAdapterStorageKeyArg, IBaseStorage, IKeyPathValuePair, IStorage, IStorageData} from './type/storage';
-import {EMPTY} from './utils/constant';
-import {executePluginsGet, executePluginsRemove, executePluginsSet, getPlugins, usePlugin} from './plugin';
+import {TempStorage} from './temp/temp-storage';
+import {TStorageEnv, TStorageType} from './type/constant';
+import {IStorageGetOption, IBaseStorage, IKeyValuePair, IStorage, IStorageData, IStorageSetOption, IStorageRemoveArg, IStorageKeyArg} from './type/storage';
+import {EMPTY, STORAGE_TYPE} from './utils/constant';
+import {executePluginsBeforeGet, executePluginsGet, executePluginsRemove, executePluginsSet, getPlugins, usePlugin} from './plugin';
 import {TimesPlugin} from './plugins/times';
-// import {CookieStorage} from './clients/web/cookie-storage';
+import {CookieStorage} from './clients/web/cookie-storage';
 import {ExpiresPlugin} from './plugins/expires';
 import {EventPlugin} from './plugins/event';
 import {getScope, registScope} from './utils/scope';
 import {FinalPlugin} from './plugins/final';
 import {ProtectPlugin} from './plugins/protect';
-import {buildFinalKeyMap, filterKeyItemsWithPath, formatStorageKeys} from './utils/path-util';
 import {isValidStorageData, parseStorageValue} from './utils/util';
 
-// const StorageMap: {
-//     [prod in TStorageEnv]: IBaseStorage
-// } = {
-//     'web': WebStorage,
-//     'miniapp': MiniAppStorage,
-//     'node': NodeStorege,
-// };
+const StorageMap: {
+    [prod in TStorageEnv]: IBaseStorage
+} = {
+    'web': WebStorage,
+    'miniapp': MiniAppStorage,
+    'node': NodeStorage,
+};
 
-// const BaseStorage: IBaseStorage = StorageMap[StorageEnv];
-
-const BaseStorage: IBaseStorage = WebStorage;
+const BaseStorage: IBaseStorage = StorageMap[StorageEnv];
 
 function getFinalBaseStorage (type: TStorageType = globalType()): IBaseStorage {
-    console.log(type);
-    return BaseStorage;
-    // if (StorageEnv === 'web' && type === 'cookie') return CookieStorage;
-    // return (type === 'temp' || (StorageEnv !== 'web' && type !== 'local')) ? TempStorege : BaseStorage; // 除了web之外 session 采用 temp 替代
+    // console.log(type);
+    // return BaseStorage;
+    if (StorageEnv === 'web' && type === 'cookie') return CookieStorage;
+    return (type === 'temp' || (StorageEnv !== 'web' && type !== 'local')) ? TempStorage : BaseStorage; // 除了web之外 session 采用 temp 替代
 }
 
 function buildFinalCallback () {
@@ -68,27 +65,16 @@ export const Storage: IStorage = {
     registScope,
     scope: getScope,
     env: StorageEnv,
-    type: (type) => {
-        if (type) {
-            setGlobalType(type);
-        } else {
-            return globalType();
-        }
-    },
-    length ({type} = {}) {
+    TYPE: STORAGE_TYPE,
+    get type () {return globalType();},
+    set type (type) {setGlobalType(type);},
+    count ({type} = {}) {
         const storage = getFinalBaseStorage(type);
-        if (storage.name === 'cookie') return storage.length({type});
-        return filterKeyItemsWithPath<string>({
-            data: storage.keys({type}), type
-        }).length;
+        if (storage.name === 'cookie') return storage.count({type});
+        return storage.keys({type}).length;
     },
     keys ({type} = {}) {
-        const storage = getFinalBaseStorage(type);
-        const keys = filterKeyItemsWithPath({
-            data: storage.keys({type}),
-            type,
-        });
-        return formatStorageKeys(keys);
+        return getFinalBaseStorage(type).keys({type});
     },
     clear (options = {}) {
         const {type, protect} = options;
@@ -101,21 +87,27 @@ export const Storage: IStorage = {
         const keys = this.keys({type});
 
         let result = true;
-        for (const item of keys) {
-            if (!this.remove({...options, key: item.key})) {
+        for (const key of keys) {
+            if (!this.remove(key, options as any)) {
                 result = false;
             }
         }
         return result;
     },
-    remove: (options) => {
-        const {key, type} = options;
+    remove: (key: string | IStorageRemoveArg, options: IStorageRemoveArg = {key: ''}) => {
+        if (typeof key === 'object') {
+            return Storage.remove(key.key, key);
+        }
+        const {type} = options;
         if (key === '') {return true;}
+        options.key = key;
         const storage = getFinalBaseStorage(type);
 
-        const {storageKey} = buildFinalKeyMap({key});
+        options = executePluginsBeforeGet({storage, options});
+        key = options.key;
 
-        const originData = storage.get({...options, key: storageKey});
+        const originData = storage.get({...options, key});
+        debugger;
         const prevData = parseStorageValue(originData);
 
         if (typeof prevData !== 'string') {
@@ -124,89 +116,103 @@ export const Storage: IStorage = {
             }
             console.warn('[prev]', prevData, options, options);
             const result = executePluginsRemove({options, storage, prevData});
-    
             if (result === false) return false;
         }
-        
-        return storage.remove({...options, key: storageKey});
+        return storage.remove({...options, key});
     },
-    exist: ({key, type}) => {
-        const {storageKey} = buildFinalKeyMap({key});
-        return getFinalBaseStorage(type).exist({key: storageKey, type});
+    exist (arg: string | IStorageKeyArg, options: IStorageKeyArg = {key: ''}) {
+        if (typeof arg === 'object') {
+            return this.exist(arg.key, arg);
+        }
+        const {key, type} = options;
+        return getFinalBaseStorage(type).exist({key, type});
     },
     
-    set (key, value, options = {value: '', key: ''}) {
-         
-        const {type, path} = options;
+    set (
+        arg: string|IStorageSetOption|IStorageSetOption[],
+        value?: any,
+        options: IStorageSetOption = {value: '', key: ''}
+    ) {
+        if (typeof arg === 'string') {
+            const {type, cookie} = options;
+            const key = arg;
 
-        if (key === '') {return false;}
-        const data = setDataConvert({data: value, storageType: type, path});
-        const storage = getFinalBaseStorage(type);
+            options.key = key;
+    
+            if (key === '') {return false;}
+            const data = setDataConvert({data: value, storageType: type, ...cookie});
+            const storage = getFinalBaseStorage(type);
+    
+            const originData = storage.get({key, type});
+            const prevData = parseStorageValue(originData);
+            
+            const setResult = executePluginsSet({options, data, storage, prevData});
+            if (typeof setResult === 'boolean') return setResult;
+    
+            console.log('executePluginsSet result', data);
+            return storage.set({...options, key: options.key, value: setResult});
+        }
 
-        const originData = storage.get({key, type});
-        const prevData = parseStorageValue(originData);
+        if (Array.isArray(arg)) {
+            let result: boolean = true;
+            for (const options of arg) {
+                if (!this.set(options)) result = false;
+            }
+            return result;
+        }
         
-        const setResult = executePluginsSet({options, data, storage, prevData});
-        if (typeof setResult === 'boolean') return setResult;
-
-        console.log('executePluginsSet result', data);
-        return storage.set({...options, key, value: setResult});
-    },
-    setWithOptions (options) {
-        const {key, value} = options;
-        return this.set(key, value, options);
-    },
-    setWithArray (array) {
-        let result: boolean = true;
-        for (const options of array) {
-            if (!this.setWithOptions(options)) result = false;
+        if (typeof arg === 'object') {
+            const {key, value} = arg;
+            return this.set(key, value, arg);
         }
-        return result;
+
+        throw new Error('Invalid set');
     },
 
-    getWithArray (array) {
-        const result: IKeyPathValuePair[] = [];
-        for (const k in array) {
-            result.push(this.get(array[k]));
+    get (
+        arg: string | IStorageGetOption | IStorageGetOption[]
+    ) {
+        if (Array.isArray(arg)) {
+            const result: IKeyValuePair[] = [];
+            for (const item of arg) {
+                result.push(this.get(item));
+            }
+            return result;
         }
-        return result;
-    },
-    getWithString (key) {
-        const options: IAdapterStorageKeyArg = {key};
-        return this.get(options);
-    },
-    get (options) {
-        const {key, type, detail} = options;
+        if (typeof arg === 'object') {
 
-        const {storagePath, storageKey} = buildFinalKeyMap({key});
+            const {type, detail} = arg;
+            if (arg.key === '') {return EMPTY;}
 
-        const buildGetReturn = (value: any = EMPTY): IKeyPathValuePair => ({value, key, path: storagePath});
+            const storage = getFinalBaseStorage(type);
 
-        if (key === '') {return buildGetReturn();}
+            arg = executePluginsBeforeGet({storage, options: arg});
 
-        const storage = getFinalBaseStorage(type);
-        const originData = storage.get({key: storageKey, type});
-        // console.log('BaseStorage', data);
+            const key = arg.key;
 
-        let data = parseStorageValue(originData);
+            const originData = storage.get({key, type});
+            // console.log('BaseStorage', data);
 
-        if (!isValidStorageData(data)) {return buildGetReturn();}
+            let data = parseStorageValue(originData);
 
-        data = data as IStorageData;
-        const {onFinalData, trigFinalData} = buildFinalCallback();
-        data = executePluginsGet({options, data, storage, storageKey, onFinalData});
+            if (!isValidStorageData(data)) {return EMPTY;}
 
-        if (typeof data === 'symbol') {return buildGetReturn();}
+            data = data as IStorageData;
+            const {onFinalData, trigFinalData} = buildFinalCallback();
+            data = executePluginsGet({options: arg, data, storage, key, onFinalData});
 
-        const finalData = getDataConvert({storageType: options.type, data});
-        trigFinalData(finalData);
+            if (typeof data === 'symbol') {return EMPTY;}
 
-        return buildGetReturn(detail ? data : finalData);
+            const finalData = getDataConvert({storageType: arg.type, data});
+            trigFinalData(finalData);
 
+            return detail ? data : finalData;
+        }
+        return this.get({key: arg});
     },
     all ({type, detail} = {}) {
         const keys = this.keys({type});
-        return keys.map(({key}) => {
+        return keys.map((key) => {
             return this.get({key, type, detail});
         });
     },

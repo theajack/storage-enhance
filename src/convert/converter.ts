@@ -1,8 +1,8 @@
 /*
  * @Author: tackchen
  * @Date: 2021-12-13 08:24:30
- * @LastEditors: tackchen
- * @LastEditTime: 2022-01-09 18:17:25
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2023-01-07 22:12:35
  * @FilePath: /storage-enhance/src/convert/converter.ts
  * @Description: Coding something
  */
@@ -13,11 +13,10 @@ import {storageTypeOf} from './storage-type';
 import {convertValue} from './value-convert';
 
 export function setDataConvert ({
-    data, storageType = 'local', path
+    data, storageType = 'local'
 }: {
     data: any;
     storageType?: TStorageType;
-    path?: string;
 }): IStorageData {
     const type = storageTypeOf(data);
     const storageData: IStorageData = {
@@ -26,9 +25,6 @@ export function setDataConvert ({
             data :
             convertValue({type, data, oprate: 'set'})
     };
-    if (typeof path === 'string' && path !== '/') {
-        storageData.path = path;
-    }
     return storageData;
 }
 

@@ -1,3 +1,8 @@
+/*
+ * @Author: chenzhongsheng
+ * @Date: 2023-01-07 14:52:49
+ * @Description: Coding something
+ */
 const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const RunNodeWebpackPlugin = require('run-node-webpack-plugin');
@@ -24,6 +29,7 @@ module.exports = () => {
             extensions: [ '.tsx', '.ts', '.js' ]
         },
         externals: {
+            'os': 'commonjs os',
             'fs': 'commonjs fs',
             'path': 'commonjs path'
         },
@@ -52,6 +58,7 @@ module.exports = () => {
             new CopyWebpackPlugin({
                 patterns: [
                     {from: 'src/type', to: 'type'},
+                    {from: 'src/index.d.ts'},
                     {from: 'README.cn.md'},
                     {from: 'README.md'},
                     {from: 'LICENSE'}
