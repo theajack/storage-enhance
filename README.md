@@ -30,7 +30,7 @@
 5. Support protect mode, protect data will not be deleted by remove and clear in normal mode
 6. Support times mode to limit the number of data access operations
 7. Support expires mode to set the data expiration time
-8. Support time monitoring for access deletion operations
+8. Support event monitoring for access deletion operations
 9. Support settings to use temp mode, only stored in memory, not written to disk
 
 ### 2.Quick to use
@@ -116,13 +116,13 @@ interface IStorageSetOption {
     final?: boolean; Whether it is immutable
     protect?: boolean; Whether it can be deleted
     type?: 'local' | 'session' | 'temp' | 'cookie'; What type the current operation uses
-    Cookie?: { // is only valid when type=cookies are enabled in the web environment
-        secure?: boolean;  default: false
-        sameSite?: ICookieSameSite;  default: Lax
-        priority?: ICookiePriority;  default: Medium
-        sameParty?: boolean;  default: false
-        expires?: Date | number;  default is session
-        path?: string;  default
+    cookie?: { // is only valid when type=cookies are enabled in the web environment
+        secure?: boolean; // default: false
+        sameSite?: ICookieSameSite; // default: Lax
+        priority?: ICookiePriority; // default: Medium
+        sameParty?: boolean; // default: false
+        expires?: Date | number; // default is session
+        path?: string; // default is /
     };
 }
 ```
@@ -142,8 +142,8 @@ The get method has the following options
 ```ts
 interface IStorageGetOption{
     key?: string;
-    type?: 'local' | 'session' | 'temp' | 'cookie'; What type the current operation uses
-    detail?: boolean; Whether data details need to be presented
+    type?: 'local' | 'session' | 'temp' | 'cookie'; // What type the current operation uses
+    detail?: boolean; // Whether data details need to be presented
 }
 ```
 
@@ -161,8 +161,8 @@ The remove method has the following options
 ```ts
 interface IStorageRemoveOption{
     key?: string;
-    type?: 'local' | 'session' | 'temp' | 'cookie'; What type the current operation uses
-    protect?: boolean; Whether to delete the protect type
+    type?: 'local' | 'session' | 'temp' | 'cookie'; // What type the current operation uses
+    protect?: boolean; // Whether to delete the protect type
     cookie?: {
         path?: string;
         domain?: string;
@@ -183,8 +183,8 @@ The clear method has the following options
 
 ```ts
 interface IStorageClearOption{
-    protect?: boolean; Whether to delete the protect type
-    type?: 'local' | 'session' | 'temp' | 'cookie'; What type the current operation uses
+    protect?: boolean; // Whether to delete the protect type
+    type?: 'local' | 'session' | 'temp' | 'cookie'; // What type the current operation uses
     cookie?: {
         path?: string;
         domain?: string;
@@ -205,7 +205,7 @@ The keys method has the following options
 
 ```ts
 interface IStorageKeysOption{
-    type?: 'local' | 'session' | 'temp' | 'cookie'; What type the current operation uses
+    type?: 'local' | 'session' | 'temp' | 'cookie'; // What type the current operation uses
 }
 ```
 
@@ -222,7 +222,7 @@ The count method has the following options
 
 ```ts
 interface IStorageCountOption{
-    type?: 'local' | 'session' | 'temp' | 'cookie'; What type the current operation uses
+    type?: 'local' | 'session' | 'temp' | 'cookie'; // What type the current operation uses
 }
 ```
 
@@ -240,7 +240,7 @@ The exist method has the following options
 ```ts
 interface IStorageExistOption {
     key?: string;
-    type?: 'local' | 'session' | 'temp' | 'cookie'; What type the current operation uses
+    type?: 'local' | 'session' | 'temp' | 'cookie'; // What type the current operation uses
 }
 ```
 
@@ -257,7 +257,7 @@ The all method has the following options
 
 ```ts
 interface IStorageExistOption {
-    type?: 'local' | 'session' | 'temp' | 'cookie'; What type the current operation uses
+    type?: 'local' | 'session' | 'temp' | 'cookie'; // What type the current operation uses
 }
 ```
 
@@ -305,7 +305,7 @@ For other examples, see [plugins](https://github.com/theajack/storage-enhance/tr
 import storage from 'storage-enhance';
 storage.use(TestPlugin);
 
-storage.plugins(); Gets the installed plug-ins
+storage.plugins(); // Gets the installed plug-ins
 ```
 
 ### 6 Other interfaces
@@ -323,7 +323,7 @@ storage.TYPE.LOCAL; //
 #### 6.2 EMPTY attribute
 
 ```js
-storage.EMPTY; Represents a null value, of type symbol
+storage.EMPTY; // Represents a null value, of type symbol
 ```
 
 #### 6.3 scope
